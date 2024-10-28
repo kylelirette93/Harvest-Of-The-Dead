@@ -10,11 +10,14 @@ public class ZombieController : MonoBehaviour
 
     // References.
     Rigidbody2D rb;
+    public ParticleSystem bloodParticles;
     public Transform playerTransform;
+    
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        bloodParticles = GetComponent<ParticleSystem>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
     }
     void Update()
@@ -26,5 +29,13 @@ public class ZombieController : MonoBehaviour
 
 
         transform.position += directionToPlayer * chaseSpeed * Time.smoothDeltaTime;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Bullet"))
+        {
+            bloodParticles.Play();
+        }
     }
 }
