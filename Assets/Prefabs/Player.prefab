@@ -182,7 +182,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 398325548222195944}
-  - component: {fileID: 8437766387873108779}
+  - component: {fileID: 5826003107673343302}
   m_Layer: 0
   m_Name: Inventory
   m_TagString: Untagged
@@ -205,7 +205,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6847594847219249852}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8437766387873108779
+--- !u!114 &5826003107673343302
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,9 +214,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 9136022155972852210}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67c6e6bd65bba7545945a30f356e830e, type: 3}
+  m_Script: {fileID: 11500000, guid: 8643041f2e1036f409b30d10b7b1b601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapons:
+  player: {fileID: 6728469933315641535}
+  weaponsList:
   - {fileID: 346593322724738094, guid: 29df0aae5e668f04e976fb21f8a73ea3, type: 3}
   bulletPrefab: {fileID: 7211225275976456693, guid: 21908b66dbeb9c741977d31d99d66346, type: 3}

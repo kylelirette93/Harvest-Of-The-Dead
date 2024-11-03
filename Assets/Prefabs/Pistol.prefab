@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 345646473170880954}
   - component: {fileID: 3296795586815231292}
+  - component: {fileID: 3550768515455182963}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -84,3 +85,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &3550768515455182963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346593322724738094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a75eb5aa21645094e86a21625082abe5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 6728469933315641535, guid: 491453233b3f1b44990fdc036eb725a4, type: 3}
+  sounds: []
+  weaponsList: []
+  bulletPrefab: {fileID: 7211225275976456693, guid: 21908b66dbeb9c741977d31d99d66346, type: 3}

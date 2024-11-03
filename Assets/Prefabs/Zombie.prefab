@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1190417835067003316}
   - component: {fileID: 7036814561741115123}
   - component: {fileID: -2086281850489920547}
+  - component: {fileID: 7811264125477930876}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -4972,3 +4973,15 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &7811264125477930876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5710785579072398033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc198ed2197b0d1419ea721eec8c433d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

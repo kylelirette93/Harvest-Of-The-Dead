@@ -3,31 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlayerController : MonoBehaviour
+public class Player : Actor
 {
     // References.
     Rigidbody2D rb;
 
     // Variables.
     public float moveSpeed = 5f;
+    float timeSinceLastShot = 0;
+    float fireCooldown;
     Vector2 moveDirection;
     Vector2 mousePosition;
 
-    void Start()
+    public override void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        fireCooldown = Weapon.instance.fireSpeed;
     }
 
-    void Update()
+    public override void Update()
     {
+        timeSinceLastShot += Time.deltaTime;
         // Get player input.
         float horizontalMovement = Input.GetAxisRaw("Horizontal");
         float verticalMovement = Input.GetAxisRaw("Vertical");
 
         // Fire weapon on mouse click.
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && timeSinceLastShot >= fireCooldown)
         {
-            WeaponManager.instance.FireWeapon();
+            Weapon.instance.Shoot();
+            timeSinceLastShot = 0f;
         }
 
         // Direction is based on input.
@@ -35,6 +40,7 @@ public class PlayerController : MonoBehaviour
 
         // Get current mouse position and convert to world space.
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
     }
 
     void FixedUpdate()

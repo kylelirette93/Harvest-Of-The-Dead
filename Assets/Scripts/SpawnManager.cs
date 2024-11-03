@@ -8,7 +8,7 @@ public class SpawnManager : MonoBehaviour
     public GameObject zombiePrefab;
     int randomSpawnIndex;
     Transform randomSpawnPoint;
-    int spawnDelay = 5;
+    public float spawnDelay = 5;
 
     void Start()
     {
@@ -21,13 +21,23 @@ public class SpawnManager : MonoBehaviour
         randomSpawnIndex = Random.Range(0, spawnPoints.Length);
         randomSpawnPoint = spawnPoints[randomSpawnIndex];
     }
-    IEnumerator SpawnEnemy(int delay)
+    IEnumerator SpawnEnemy(float delay)
     {
         while (true)
         {
             GameObject newZombie = Instantiate(zombiePrefab, randomSpawnPoint.position, zombiePrefab.transform.rotation);
             yield return new WaitForSeconds(delay);
             RandomizeSpawnPoint();
+
+            if (spawnDelay > 1.5f)
+            {
+                spawnDelay -= 0.1f;
+            }
+            else
+            {
+                spawnDelay = 1.5f;
+            }
+            delay = Mathf.Clamp(spawnDelay, 1.5f, 5);
         }
     }
 }
