@@ -5,7 +5,7 @@ using UnityEngine;
 public class Zombie : Actor
 {
     // Variables
-    float chaseSpeed = 2f;
+    public float chaseSpeed;
 
     // References
     Rigidbody2D rb;
@@ -121,7 +121,6 @@ public class Zombie : Actor
         if (collision.gameObject.CompareTag("Bullet"))
         {
             bloodParticles.Play();
-            healthSystem.TakeDamage(10);
         }
     }
 }

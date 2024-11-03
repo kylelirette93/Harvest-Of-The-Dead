@@ -14,15 +14,19 @@ public class Player : Actor
     float fireCooldown;
     Vector2 moveDirection;
     Vector2 mousePosition;
+    int currentHealth;
 
     public override void Start()
     {
+        base.Start();
         rb = GetComponent<Rigidbody2D>();
         fireCooldown = Weapon.instance.fireSpeed;
+        currentHealth = healthSystem.currentHealth;
     }
 
     public override void Update()
     {
+        base.Update();
         timeSinceLastShot += Time.deltaTime;
         // Get player input.
         float horizontalMovement = Input.GetAxisRaw("Horizontal");
@@ -40,7 +44,6 @@ public class Player : Actor
 
         // Get current mouse position and convert to world space.
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
     }
 
     void FixedUpdate()
@@ -56,5 +59,18 @@ public class Player : Actor
 
         // Apply angle to rotate rigidbody.
         rb.rotation = aimAngle;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Zombie"))
+        {
+            healthSystem.TakeDamage(10);
+        }
+    }
+
+    public override void Die()
+    {
+        gameObject.SetActive(false);
     }
 }

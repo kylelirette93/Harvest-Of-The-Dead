@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 1974960544874807967}
   m_Layer: 0
   m_Name: Zombie
-  m_TagString: Untagged
+  m_TagString: Zombie
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -102,6 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3cefd4ca07ee804fb5f6dc0023b14c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chaseSpeed: 2
   bloodParticles: {fileID: 7036814561741115123}
   playerTransform: {fileID: 6847594847219249852, guid: 491453233b3f1b44990fdc036eb725a4, type: 3}
 --- !u!61 &8910408801949117896

@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour 
 {
-    int bulletDamage = 5;
+    int bulletDamage;
+
+    private void Start()
+    {
+        bulletDamage = Weapon.instance.damage;
+    }
     void OnCollisionEnter2D(Collision2D collision)
     {
         Actor actor = collision.gameObject.GetComponent<Actor>();

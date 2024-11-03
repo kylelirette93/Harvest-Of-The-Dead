@@ -12,7 +12,7 @@ public class Weapon : MonoBehaviour
     int maxCapacity;
     int reloadSpeed;
     public float fireSpeed = 0.25f;
-    int damage;
+    public int damage;
     int bulletSpeed;
     bool canShoot = true;
     bool isReloading = false;
