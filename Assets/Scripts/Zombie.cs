@@ -26,7 +26,7 @@ public class Zombie : Actor
     // Current State
     private ZombieState currentState;
 
-    public override void Start()
+    void OnEnable()
     {
         base.Start();
         currentHealth = healthSystem.currentHealth;
@@ -108,8 +108,12 @@ public class Zombie : Actor
         base.Die();
         SetZombieState(ZombieState.Dead);  // Ensure state is set to Dead
         zombieCollider.enabled = false;
-        this.enabled = false;
-        Destroy(gameObject, 1f);  // Delay destruction for animation
+        Invoke("DeactivateZombie", 1f);  // Delay deactivation for animation
+    }
+
+    void DeactivateZombie()
+    {
+        gameObject.SetActive(false);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

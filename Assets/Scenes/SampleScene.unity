@@ -8509,6 +8509,7 @@ MonoBehaviour:
   - {fileID: 1838633179}
   - {fileID: 472129401}
   zombiePrefab: {fileID: 5710785579072398033, guid: e52ba359f98a913469613f5627c5769e, type: 3}
+  spawnDelay: 5
 --- !u!4 &1350524875
 Transform:
   m_ObjectHideFlags: 0
@@ -9730,6 +9731,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4235859594453398576, guid: b593bc9345f664a4ca83da78da554a0b, type: 3}
   m_PrefabInstance: {fileID: 1838633178}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2060155309
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2060155311}
+  - component: {fileID: 2060155310}
+  m_Layer: 0
+  m_Name: _GM
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2060155310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060155309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9da95eef1c05c714684bd1ec3057b13d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pooledObjects: []
+  objectToPool: {fileID: 5710785579072398033, guid: e52ba359f98a913469613f5627c5769e, type: 3}
+  amountToPool: 300
+--- !u!4 &2060155311
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060155309}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2065472575
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9803,3 +9851,4 @@ SceneRoots:
   - {fileID: 191995788}
   - {fileID: 1350524875}
   - {fileID: 1389404206}
+  - {fileID: 2060155311}

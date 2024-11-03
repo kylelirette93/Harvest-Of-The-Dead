@@ -25,7 +25,12 @@ public class SpawnManager : MonoBehaviour
     {
         while (true)
         {
-            GameObject newZombie = Instantiate(zombiePrefab, randomSpawnPoint.position, zombiePrefab.transform.rotation);
+            GameObject newZombie = ObjectPool.sharedInstance.GetPooledObject();
+            if (newZombie != null)
+            {
+                newZombie.transform.position = randomSpawnPoint.position;
+                newZombie.SetActive(true);
+            }
             yield return new WaitForSeconds(delay);
             RandomizeSpawnPoint();
 
