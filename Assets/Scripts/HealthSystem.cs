@@ -5,7 +5,7 @@ using UnityEngine;
 public class HealthSystem
 {
     public int currentHealth;
-    int maxHealth = 50;
+    const int maxHealth = 100;
 
     public void ResetGame()
     {
@@ -15,7 +15,7 @@ public class HealthSystem
     public void TakeDamage(int dmg)
     {
         currentHealth -= dmg; 
-        Mathf.Clamp(currentHealth, 0, maxHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
     }
 
 }

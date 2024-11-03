@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1190417835067003316}
   - component: {fileID: 7036814561741115123}
   - component: {fileID: -2086281850489920547}
-  - component: {fileID: 7811264125477930876}
+  - component: {fileID: 1974960544874807967}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -175,7 +175,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 3
+  m_Constraints: 7
 --- !u!198 &7036814561741115123
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -4973,15 +4973,24 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &7811264125477930876
-MonoBehaviour:
+--- !u!95 &1974960544874807967
+Animator:
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5710785579072398033}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc198ed2197b0d1419ea721eec8c433d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b7371007407586b42bc570c27c0b8afd, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

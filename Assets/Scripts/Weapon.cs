@@ -32,7 +32,7 @@ public class Weapon : MonoBehaviour
         capacity = 10;
         maxCapacity = capacity;
         reloadSpeed = 2;
-        damage = 5;
+        damage = 10;
         bulletSpeed = 20;
 
         Vector3 weaponOffset = new Vector3(0, 0.5f, 0);
