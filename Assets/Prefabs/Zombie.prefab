@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7036814561741115123}
   - component: {fileID: -2086281850489920547}
   - component: {fileID: 1974960544874807967}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Zombie
   m_TagString: Zombie
   m_Icon: {fileID: 0}
@@ -105,6 +105,9 @@ MonoBehaviour:
   chaseSpeed: 2
   bloodParticles: {fileID: 7036814561741115123}
   playerTransform: {fileID: 6847594847219249852, guid: 491453233b3f1b44990fdc036eb725a4, type: 3}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!61 &8910408801949117896
 BoxCollider2D:
   m_ObjectHideFlags: 0

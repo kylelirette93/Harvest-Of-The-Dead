@@ -1,11 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class Zombie : Actor
 {
     // Variables
     public float chaseSpeed;
+    int mapMinX = -15;
+    int mapMaxX = 15;
+    int mapMinY = -7;
+    int mapMaxY = 7;
 
     // References
     Rigidbody2D rb;
@@ -14,6 +19,7 @@ public class Zombie : Actor
     public Transform playerTransform;
     int currentHealth;
     BoxCollider2D zombieCollider;
+    public LayerMask enemyLayer;
 
     // Enum for Zombie State
     private enum ZombieState
@@ -52,7 +58,27 @@ public class Zombie : Actor
             float facingAngle = Mathf.Atan2(facingDirection.x, -facingDirection.y) * Mathf.Rad2Deg;
             rb.rotation = facingAngle;
 
-            transform.position += directionToPlayer * chaseSpeed * Time.smoothDeltaTime;
+            Vector3 separationForce = Vector3.zero;
+            float separationRadius = 1.5f;
+            Collider2D[] nearbyZombies = Physics2D.OverlapCircleAll(transform.position, separationRadius);
+            foreach (Collider2D zombie in nearbyZombies)
+            {
+                if (zombie.gameObject != this.gameObject && zombie.CompareTag("Zombie"))
+                {
+                    Vector3 directionToZombie = (transform.position - zombie.transform.position).normalized;
+                    separationForce += directionToZombie;
+                }
+            }
+
+            Vector3 finalDirection = (directionToPlayer + separationForce).normalized;
+            Vector3 newPosition = transform.position + finalDirection * chaseSpeed * Time.smoothDeltaTime;
+
+            // Check boundaries of map
+            newPosition.x = Mathf.Clamp(newPosition.x, mapMinX, mapMaxX);
+            newPosition.y = Mathf.Clamp(newPosition.y, mapMinY, mapMaxY);
+
+            transform.position = newPosition;
+           
         }
 
         // Update zombie state based on health
@@ -62,8 +88,7 @@ public class Zombie : Actor
             UpdateZombieState();
         }
     }
-
-    private void UpdateZombieState()
+     private void UpdateZombieState()
     {
         if (currentHealth > 60)
         {
