@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
@@ -17,6 +18,8 @@ public class GameManager : MonoBehaviour
     public GameObject healthPanel;
     public GameObject deathPanel;
     public GameObject upgradePanel;
+
+    GameObject playerInstance;
 
     void Awake()
     {
@@ -54,7 +57,7 @@ public class GameManager : MonoBehaviour
         EnterState(currentState);
     }
 
-    void ExitState(GameState state)
+    public void ExitState(GameState state)
     {
         switch (state)
         {
@@ -73,7 +76,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void EnterState(GameState state)
+    public void EnterState(GameState state)
     {
         switch (state)
         {
@@ -83,7 +86,6 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Playing:
                 gunPanel.SetActive(true);
-                healthPanel.SetActive(true);
                 SpawnPlayer();
                 SpawnEnemies();
                 Time.timeScale = 1;
@@ -93,9 +95,25 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0;
                 break;
             case GameState.Retreat:
+                Destroy(playerInstance);
+                DespawnEnemies();
+                DeactivateZombies("Zombie");
                 upgradePanel.SetActive(true);
                 Time.timeScale = 0;
                 break;
+        }
+    }
+
+    void DeactivateZombies(string tag)
+    {
+        GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
+        foreach (GameObject obj in objects)
+        {
+            Zombie zombie = obj.GetComponent<Zombie>();
+            if (zombie != null)
+            {
+                zombie.DeactivateZombie();
+            }
         }
     }
 
@@ -106,7 +124,7 @@ public class GameManager : MonoBehaviour
 
     void SpawnPlayer()
     {
-        GameObject playerInstance = Instantiate(playerPrefab);
+        playerInstance = Instantiate(playerPrefab);
     }
 
     
@@ -114,6 +132,11 @@ public class GameManager : MonoBehaviour
     void SpawnEnemies()
     {
         spawnManagerScript.enabled = true;
+    }
+
+    void DespawnEnemies()
+    {
+        spawnManagerScript.enabled = false;
     }
 
     public void QuitGame()

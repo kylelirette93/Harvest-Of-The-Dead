@@ -100,6 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 419c2a3c75835c64b92031e6ad364034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 8511738350632817641, guid: 49df56e8c2b5a5642b6689855ddbe5f7, type: 3}
   moveSpeed: 7
 --- !u!50 &3126551182211478624
 Rigidbody2D:

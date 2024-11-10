@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c4334b4077273794dbd089d33005fc69
+guid: 899855ff9e31f9940bd535db5fb1d069
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Heart_0
+      name: MoneyBag_0
       rect:
         serializedVersion: 2
         x: 0
@@ -111,8 +111,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3bf0f0df333832c4c83b9160eea07f62
-      internalID: 609136150
+      spriteID: f60f16005b53336479704f507f1e2bca
+      internalID: 1678450178
       vertices: []
       indices: 
       edges: []
@@ -128,7 +128,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Heart_0: 609136150
+      MoneyBag_0: 1678450178
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

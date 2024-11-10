@@ -15,13 +15,20 @@ public class ObjectPool : MonoBehaviour
 
     void Start()
     {
-        pooledObjects = new List<GameObject>();
-        GameObject tmp;
-        for (int i = 0; i < amountToPool; i++)
+        if (objectToPool != null) 
+        {             
+            pooledObjects = new List<GameObject>();
+            GameObject tmp;
+            for (int i = 0; i < amountToPool; i++)
+            {
+                tmp = Instantiate(objectToPool);
+                tmp.SetActive(false);
+                pooledObjects.Add(tmp);
+            }
+        }
+        else
         {
-            tmp = Instantiate(objectToPool);
-            tmp.SetActive(false);
-            pooledObjects.Add(tmp);
+            Debug.Log("Enemy's aren't ready to spawn yet.");
         }
     }
 

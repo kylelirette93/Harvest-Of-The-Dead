@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Player : Actor
 {
     // References.
     Rigidbody2D rb;
+    public Image healthBarFill;
 
     // Variables.
     public float moveSpeed = 5f;
@@ -19,6 +21,19 @@ public class Player : Actor
     public override void Start()
     {
         base.Start();
+
+        GameObject healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
+        Transform healthBarTransform = healthBarInstance.transform;
+
+        healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
+
+        Canvas healthCanvas = FindObjectOfType<Canvas>();
+        if (healthCanvas != null)
+        {
+            healthBarTransform.SetParent(healthCanvas.transform, false);
+        }
+        healthBarTransform.localScale = Vector3.one;
+
         rb = GetComponent<Rigidbody2D>();
         fireCooldown = Weapon.instance.fireSpeed;
         currentHealth = healthSystem.currentHealth;
@@ -27,6 +42,28 @@ public class Player : Actor
     public override void Update()
     {
         base.Update();
+
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up);
+        healthBarFill.transform.position = screenPosition;
+
+        healthBarFill.fillAmount = healthSystem.currentHealth / (float)healthSystem.maxHealth;
+
+        if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.25f)
+        {
+            // Health is 25% or lower
+            healthBarFill.color = Color.red; 
+        }
+        else if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.5f)
+        {
+            // Health is 50% or lower
+            healthBarFill.color = Color.yellow; 
+        }
+        else
+        {
+            // Health is above 50%
+            healthBarFill.color = Color.green; 
+        }
+
         timeSinceLastShot += Time.deltaTime;
         // Get player input.
         float horizontalMovement = Input.GetAxisRaw("Horizontal");
@@ -67,6 +104,14 @@ public class Player : Actor
         {
             healthSystem.TakeDamage(10);
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Home"))
+         {
+            GameManager.instance.ChangeState(GameManager.GameState.Retreat);
+         }
     }
 
     public override void Die()

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7036814561741115123}
   - component: {fileID: -2086281850489920547}
   - component: {fileID: 1974960544874807967}
+  - component: {fileID: 4047818349918669072}
   m_Layer: 3
   m_Name: Zombie
   m_TagString: Zombie
@@ -102,7 +103,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3cefd4ca07ee804fb5f6dc0023b14c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 8511738350632817641, guid: 49df56e8c2b5a5642b6689855ddbe5f7, type: 3}
+  healthBarFill: {fileID: 0}
   chaseSpeed: 2
+  healthBarFill: {fileID: 0}
+  healthBarPrefab: {fileID: 0}
   bloodParticles: {fileID: 7036814561741115123}
   playerTransform: {fileID: 6847594847219249852, guid: 491453233b3f1b44990fdc036eb725a4, type: 3}
   enemyLayer:
@@ -4998,3 +5003,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4047818349918669072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5710785579072398033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c901795342be154fb3fdd4b456c40db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  items:
+  - {fileID: 6340000157006770135, guid: b460a4831fe04eb4fbb97e7d54fb98d0, type: 3}
+  - {fileID: 509066982618664317, guid: 814b7b6f274905f438d2824f933f640b, type: 3}

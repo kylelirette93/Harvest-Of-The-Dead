@@ -2,24 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
+using UnityEngine.UI;
+
 public class Zombie : Actor
-{  // Variables
+{
     public float chaseSpeed;
     int mapMinX = -15;
     int mapMaxX = 15;
     int mapMinY = -7;
     int mapMaxY = 7;
+    int currentHealth;
 
-  // References
     Rigidbody2D rb;
+    public Image healthBarFill;
     Animator animator;
     public ParticleSystem bloodParticles;
     public Transform playerTransform;
-    int currentHealth;
     BoxCollider2D zombieCollider;
-    public LayerMask enemyLayer;
+    private DropItem dropItem;
 
-    // Enum for Zombie State
     private enum ZombieState
     {
         Healthy,
@@ -27,12 +28,12 @@ public class Zombie : Actor
         Dead
     }
 
-    // Current State
     private ZombieState currentState;
 
     void OnEnable()
     {
         base.Start();
+        dropItem = GetComponent<DropItem>();
         currentHealth = healthSystem.currentHealth;
         zombieCollider = GetComponent<BoxCollider2D>();
         zombieCollider.enabled = true;
@@ -41,14 +42,41 @@ public class Zombie : Actor
         bloodParticles = GetComponent<ParticleSystem>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
 
-        UpdateZombieState();  // Initialize the zombie's state
+        GameObject healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
+        Transform healthBarTransform = healthBarInstance.transform;
+        healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
+        Canvas healthCanvas = FindObjectOfType<Canvas>();
+        if (healthCanvas != null)
+        {
+            healthBarTransform.SetParent(healthCanvas.transform, false);
+        }
+        healthBarTransform.localScale = Vector3.one;
+        healthBarInstance.SetActive(true);
+
+        UpdateZombieState();
     }
 
     public override void Update()
     {
         base.Update();
 
-        // Chase the player if not dead
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * 1.5f);
+        healthBarFill.transform.position = screenPosition;
+        healthBarFill.fillAmount = healthSystem.currentHealth / (float)healthSystem.maxHealth;
+
+        if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.25f)
+        {
+            healthBarFill.color = Color.red;
+        }
+        else if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.5f)
+        {
+            healthBarFill.color = Color.yellow;
+        }
+        else
+        {
+            healthBarFill.color = Color.green;
+        }
+
         if (currentState != ZombieState.Dead)
         {
             Vector3 directionToPlayer = (playerTransform.position - transform.position).normalized;
@@ -77,22 +105,18 @@ public class Zombie : Actor
 
             Vector3 finalDirection = (directionToPlayer + separationForce).normalized;
             Vector3 newPosition = transform.position + finalDirection * chaseSpeed * Time.smoothDeltaTime;
-
-            // Check boundaries of map
             newPosition.x = Mathf.Clamp(newPosition.x, mapMinX, mapMaxX);
             newPosition.y = Mathf.Clamp(newPosition.y, mapMinY, mapMaxY);
-
             transform.position = newPosition;
-
         }
 
-        // Update zombie state based on health
         if (healthSystem.currentHealth != currentHealth)
         {
             currentHealth = healthSystem.currentHealth;
             UpdateZombieState();
         }
     }
+
     private void UpdateZombieState()
     {
         if (currentHealth > 60)
@@ -136,14 +160,23 @@ public class Zombie : Actor
     public override void Die()
     {
         base.Die();
-        SetZombieState(ZombieState.Dead);  // Ensure state is set to Dead
+        SetZombieState(ZombieState.Dead);
         zombieCollider.enabled = false;
-        Invoke("DeactivateZombie", 1f);  // Delay deactivation for animation
+        Invoke("DeactivateZombie", 1f);
+        if (dropItem != null)
+        {
+            GameObject droppedItem = dropItem.GetRandomDrop();
+            if (droppedItem != null)
+            {
+                Instantiate(droppedItem, transform.position, Quaternion.identity);
+            }
+        }
     }
 
-    void DeactivateZombie()
+    public void DeactivateZombie()
     {
-        gameObject.SetActive(false);
+        healthBarFill.transform.parent.gameObject.SetActive(false);
+        this.gameObject.SetActive(false);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
