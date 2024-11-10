@@ -2,17 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
-
 public class Zombie : Actor
-{
-    // Variables
+{  // Variables
     public float chaseSpeed;
     int mapMinX = -15;
     int mapMaxX = 15;
     int mapMinY = -7;
     int mapMaxY = 7;
 
-    // References
+  // References
     Rigidbody2D rb;
     Animator animator;
     public ParticleSystem bloodParticles;
@@ -61,13 +59,20 @@ public class Zombie : Actor
             Vector3 separationForce = Vector3.zero;
             float separationRadius = 1.5f;
             Collider2D[] nearbyZombies = Physics2D.OverlapCircleAll(transform.position, separationRadius);
+            int nearbyCount = 0;
             foreach (Collider2D zombie in nearbyZombies)
             {
                 if (zombie.gameObject != this.gameObject && zombie.CompareTag("Zombie"))
                 {
                     Vector3 directionToZombie = (transform.position - zombie.transform.position).normalized;
                     separationForce += directionToZombie;
+                    nearbyCount++;
                 }
+            }
+
+            if (nearbyCount > 0)
+            {
+                separationForce = (separationForce / nearbyCount).normalized;
             }
 
             Vector3 finalDirection = (directionToPlayer + separationForce).normalized;
@@ -78,7 +83,7 @@ public class Zombie : Actor
             newPosition.y = Mathf.Clamp(newPosition.y, mapMinY, mapMaxY);
 
             transform.position = newPosition;
-           
+
         }
 
         // Update zombie state based on health
@@ -88,7 +93,7 @@ public class Zombie : Actor
             UpdateZombieState();
         }
     }
-     private void UpdateZombieState()
+    private void UpdateZombieState()
     {
         if (currentHealth > 60)
         {

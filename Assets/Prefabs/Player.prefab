@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 419c2a3c75835c64b92031e6ad364034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 7
 --- !u!50 &3126551182211478624
 Rigidbody2D:
   serializedVersion: 4
@@ -217,6 +217,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8643041f2e1036f409b30d10b7b1b601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fireSpeed: 0.25
+  damage: 0
   player: {fileID: 6728469933315641535}
   weaponsList:
   - {fileID: 346593322724738094, guid: 29df0aae5e668f04e976fb21f8a73ea3, type: 3}
