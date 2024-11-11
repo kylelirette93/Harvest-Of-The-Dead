@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR;
 
@@ -15,7 +16,6 @@ public class GameManager : MonoBehaviour
     public GameObject graveyardPrefab;
     public GameObject playerPrefab;
     public SpawnManager spawnManagerScript;
-    public GameObject healthPanel;
     public GameObject deathPanel;
     public GameObject upgradePanel;
 
@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     {
         MainMenu,
         Playing,
+        NewDay,
         Death,
         Retreat,
     }
@@ -67,6 +68,11 @@ public class GameManager : MonoBehaviour
             case GameState.Playing:
                 gunPanel.SetActive(false);
                 break;
+            case GameState.NewDay:
+                gunPanel.SetActive(false);
+                SpawnPlayer();
+                SpawnEnemies();
+                break;
             case GameState.Death:
                 deathPanel.SetActive(false);
                 break;
@@ -90,11 +96,22 @@ public class GameManager : MonoBehaviour
                 SpawnEnemies();
                 Time.timeScale = 1;
                 break;
+            case GameState.NewDay:
+                gunPanel.SetActive(true);
+                SpawnPlayer();
+                SpawnEnemies();
+                Time.timeScale = 1;
+                break;
             case GameState.Death:
+                DeactivateHealthBar();
+                Destroy(playerInstance);
+                DespawnEnemies();
+                DeactivateZombies("Zombie");
                 deathPanel.SetActive(true);
                 Time.timeScale = 0;
                 break;
             case GameState.Retreat:
+                DeactivateHealthBar();
                 Destroy(playerInstance);
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
@@ -102,6 +119,11 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0;
                 break;
         }
+    }
+
+    void DeactivateHealthBar()
+    {
+        playerInstance.GetComponent<Player>().healthBarFill.enabled = false;
     }
 
     void DeactivateZombies(string tag)
@@ -122,6 +144,11 @@ public class GameManager : MonoBehaviour
         ChangeState(GameState.Playing);
     }
 
+    public void StartNewDay()
+    {
+        ChangeState(GameState.NewDay);
+    }
+
     void SpawnPlayer()
     {
         playerInstance = Instantiate(playerPrefab);
@@ -132,6 +159,8 @@ public class GameManager : MonoBehaviour
     void SpawnEnemies()
     {
         spawnManagerScript.enabled = true;
+        spawnManagerScript.globalChaseSpeed = 1.5f;
+        spawnManagerScript.spawnDelay = 5f;
     }
 
     void DespawnEnemies()

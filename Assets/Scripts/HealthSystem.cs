@@ -27,6 +27,13 @@ public class HealthSystem
         UpdateHealthBar();
     }
 
+    public void Heal(int hp)
+    {
+        currentHealth += hp;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        UpdateHealthBar();
+    }
+
     void UpdateHealthBar()
     {
         if (healthBar != null)

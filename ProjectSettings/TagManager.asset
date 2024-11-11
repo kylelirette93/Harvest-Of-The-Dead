@@ -7,6 +7,8 @@ TagManager:
   - Bullet
   - Zombie
   - Home
+  - Money
+  - Health
   layers:
   - Default
   - TransparentFX

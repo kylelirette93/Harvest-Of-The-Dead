@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class Player : Actor
 {
+    CurrencySystem currencySystem = new CurrencySystem();
+    public TextMeshProUGUI currencyText;
+
     // References.
     Rigidbody2D rb;
     public Image healthBarFill;
+    public GameObject healthBarInstance;
 
     // Variables.
     public float moveSpeed = 5f;
@@ -18,12 +23,15 @@ public class Player : Actor
     Vector2 mousePosition;
     int currentHealth;
 
+    
+
     public override void Start()
     {
         base.Start();
 
-        GameObject healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
+        healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
         Transform healthBarTransform = healthBarInstance.transform;
+        currencyText = GameObject.Find("currencyText").GetComponent<TextMeshProUGUI>();
 
         healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
 
@@ -109,13 +117,32 @@ public class Player : Actor
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Home"))
+        {
+            GameManager.instance.ChangeState(GameManager.GameState.Retreat);
+        }
+
+        if (other.gameObject.CompareTag("Money"))
+        {
+            currencySystem.AddCurrency();
+            currencyText.text = "Cash: " + currencySystem.currency;
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Health"))
+        {
+            healthSystem.Heal(10);
+            Destroy(other.gameObject);
+        }
+        if (other.gameObject.CompareTag("Home"))
          {
             GameManager.instance.ChangeState(GameManager.GameState.Retreat);
          }
     }
+    
 
     public override void Die()
     {
         gameObject.SetActive(false);
+        GameManager.instance.ChangeState(GameManager.GameState.Death);
     }
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8754508828202375012}
   - component: {fileID: 3126551182211478624}
   - component: {fileID: 2352285380858966352}
+  - component: {fileID: 2607445887024624717}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -101,6 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthBarPrefab: {fileID: 8511738350632817641, guid: 49df56e8c2b5a5642b6689855ddbe5f7, type: 3}
+  healthBarFill: {fileID: 0}
   moveSpeed: 7
 --- !u!50 &3126551182211478624
 Rigidbody2D:
@@ -174,6 +176,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.6394739, y: 0.6163326}
   m_EdgeRadius: 0
+--- !u!114 &2607445887024624717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6728469933315641535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a53c32b096173e4a980c1f44ff95e4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currencyText: {fileID: 0}
 --- !u!1 &9136022155972852210
 GameObject:
   m_ObjectHideFlags: 0
