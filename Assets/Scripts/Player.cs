@@ -22,7 +22,6 @@ public class Player : Actor
     Vector2 moveDirection;
     Vector2 mousePosition;
     int currentHealth;
-
     
 
     public override void Start()
@@ -124,7 +123,7 @@ public class Player : Actor
         if (other.gameObject.CompareTag("Money"))
         {
             currencySystem.AddCurrency();
-            currencyText.text = "Cash: " + CurrencySystem.currency;
+            UpdateUI();
             Destroy(other.gameObject);
         }
 
@@ -137,6 +136,11 @@ public class Player : Actor
          {
             GameManager.instance.ChangeState(GameManager.GameState.Retreat);
          }
+    }
+
+    public void UpdateUI()
+    {
+        currencyText.text = "Cash: " + CurrencySystem.currency;
     }
     
 

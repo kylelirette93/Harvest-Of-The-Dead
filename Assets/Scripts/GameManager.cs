@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
     public enum GameState
     {
         MainMenu,
+        Init,
         Playing,
         NewDay,
         Death,
@@ -67,6 +68,8 @@ public class GameManager : MonoBehaviour
             case GameState.MainMenu:
                 mainMenuPanel.SetActive(false);
                 break;
+            case GameState.Init:
+                break;
             case GameState.Playing:
                 gunPanel.SetActive(false);
                 statsPanel.SetActive(false);
@@ -93,25 +96,31 @@ public class GameManager : MonoBehaviour
                 mainMenuPanel.SetActive(true);
                 Time.timeScale = 0;
                 break;
-            case GameState.Playing:
-                SpawnPlayer();
+            case GameState.Init:
                 gunPanel.SetActive(true);
                 statsPanel.SetActive(true);
+                SpawnPlayer();
+                ActivatePlayer();
+                Time.timeScale = 1;
+                ChangeState(GameState.Playing);
+                break;
+            case GameState.Playing:          
                 SpawnEnemies();
                 Time.timeScale = 1;
                 break;
             case GameState.NewDay:
-                SpawnPlayer();
-                CurrencySystem.ResetCurrency();
-                CurrencySystem.ResetEarnedCurrency();
                 gunPanel.SetActive(true);
                 statsPanel.SetActive(true);
+                ActivatePlayer();
                 SpawnEnemies();
+                CurrencySystem.ResetCurrency();
+                CurrencySystem.ResetEarnedCurrency();
+                UpdateCurrencyText();
                 Time.timeScale = 1;
                 break;
             case GameState.Death:
                 DeactivateHealthBar();
-                Destroy(playerInstance);
+                DeactivatePlayer();
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
                 deathPanel.SetActive(true);
@@ -119,7 +128,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Retreat:
                 DeactivateHealthBar();
-                Destroy(playerInstance);
+                DeactivatePlayer();
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
                 CurrencySystem.BankCurrency();
@@ -150,7 +159,17 @@ public class GameManager : MonoBehaviour
 
     public void PlayGame()
     {
-        ChangeState(GameState.Playing);
+        ChangeState(GameState.Init);
+    }
+
+    public void ActivatePlayer()
+    {
+        playerInstance.SetActive(true);
+    }
+
+    public void DeactivatePlayer()
+    {
+        playerInstance.SetActive(false);
     }
 
     public void StartNewDay()
@@ -163,6 +182,11 @@ public class GameManager : MonoBehaviour
         playerInstance = Instantiate(playerPrefab);
     }
 
+    void UpdateCurrencyText()
+    {
+        Player player = playerInstance.GetComponent<Player>();
+        player.UpdateUI();
+    }
     
 
     void SpawnEnemies()
