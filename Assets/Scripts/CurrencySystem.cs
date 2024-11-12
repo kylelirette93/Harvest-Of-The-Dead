@@ -5,10 +5,31 @@ using UnityEngine;
 
 public class CurrencySystem
 {
-    public int currency;
+    public static int currency;
+    public static int bankedCurrency = 0;
+    public static int earnedCurrency = 0;
 
     public void AddCurrency()
     {
-        currency += Random.Range(10, 100);
+        int earned = Random.Range(10, 100);
+        currency += earned;
+        earnedCurrency += earned;
+    }
+
+    public static void BankCurrency()
+    {
+        bankedCurrency += currency;
+        ResetCurrency();
+    }
+
+    public static void ResetCurrency()
+    {
+        currency = 0;
+    }
+
+    public static void ResetEarnedCurrency()
+    {
+        // Reset currency earned for the day.
+        earnedCurrency = 0;
     }
 }

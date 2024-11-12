@@ -17,7 +17,9 @@ public class GameManager : MonoBehaviour
     public GameObject playerPrefab;
     public SpawnManager spawnManagerScript;
     public GameObject deathPanel;
-    public GameObject upgradePanel;
+    public GameObject retreatPanel;
+    public GameObject statsPanel;
+    public DisplayCurrency displayCurrencyScript;
 
     GameObject playerInstance;
 
@@ -67,6 +69,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Playing:
                 gunPanel.SetActive(false);
+                statsPanel.SetActive(false);
                 break;
             case GameState.NewDay:
                 gunPanel.SetActive(false);
@@ -77,7 +80,7 @@ public class GameManager : MonoBehaviour
                 deathPanel.SetActive(false);
                 break;
             case GameState.Retreat:
-                upgradePanel.SetActive(false);
+                retreatPanel.SetActive(false);
                 break;
         }
     }
@@ -91,14 +94,18 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0;
                 break;
             case GameState.Playing:
-                gunPanel.SetActive(true);
                 SpawnPlayer();
+                gunPanel.SetActive(true);
+                statsPanel.SetActive(true);
                 SpawnEnemies();
                 Time.timeScale = 1;
                 break;
             case GameState.NewDay:
-                gunPanel.SetActive(true);
                 SpawnPlayer();
+                CurrencySystem.ResetCurrency();
+                CurrencySystem.ResetEarnedCurrency();
+                gunPanel.SetActive(true);
+                statsPanel.SetActive(true);
                 SpawnEnemies();
                 Time.timeScale = 1;
                 break;
@@ -115,7 +122,9 @@ public class GameManager : MonoBehaviour
                 Destroy(playerInstance);
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
-                upgradePanel.SetActive(true);
+                CurrencySystem.BankCurrency();
+                retreatPanel.SetActive(true);
+                displayCurrencyScript.UpdateUI();
                 Time.timeScale = 0;
                 break;
         }

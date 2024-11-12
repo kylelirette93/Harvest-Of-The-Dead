@@ -124,7 +124,7 @@ public class Player : Actor
         if (other.gameObject.CompareTag("Money"))
         {
             currencySystem.AddCurrency();
-            currencyText.text = "Cash: " + currencySystem.currency;
+            currencyText.text = "Cash: " + CurrencySystem.currency;
             Destroy(other.gameObject);
         }
 
