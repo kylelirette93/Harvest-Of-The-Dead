@@ -158,6 +158,7 @@ public class GameManager : MonoBehaviour
             Zombie zombie = obj.GetComponent<Zombie>();
             if (zombie != null)
             {
+                zombie.chaseSpeed = 2;
                 zombie.DeactivateZombie();
             }
         }
