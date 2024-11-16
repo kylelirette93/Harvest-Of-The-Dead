@@ -76,7 +76,6 @@ public class Zombie : Actor
 
         Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up);
         healthBarFill.transform.position = screenPosition;
-        Debug.Log("Health bar fill position: " + healthBarFill.transform.position);
         healthBarFill.fillAmount = healthSystem.currentHealth / (float)healthSystem.maxHealth;
 
         if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.25f)

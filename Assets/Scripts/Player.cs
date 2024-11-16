@@ -23,6 +23,10 @@ public class Player : Actor
     Vector2 moveDirection;
     Vector2 mousePosition;
     int currentHealth;
+    int mapMinX = -15;
+    int mapMaxX = 15;
+    int mapMinY = -7;
+    int mapMaxY = 7;
 
     private void Awake()
     {
@@ -105,6 +109,10 @@ public class Player : Actor
 
         // Get current mouse position and convert to world space.
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        Vector3 currentPosition = transform.position;
+        currentPosition.x = Mathf.Clamp(currentPosition.x, mapMinX, mapMaxX);
+        currentPosition.y = Mathf.Clamp(currentPosition.y, mapMinY, mapMaxY);
     }
 
     void FixedUpdate()
@@ -181,6 +189,7 @@ public class Player : Actor
     public override void Die()
     {
         gameObject.SetActive(false);
+        healthSystem.Heal(healthSystem.maxHealth);
         GameManager.instance.ChangeState(GameManager.GameState.Death);
     }
 }

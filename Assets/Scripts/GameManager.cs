@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public SpawnManager spawnManagerScript;
     public GameObject deathPanel;
     public GameObject retreatPanel;
+    public GameObject upgradePanel;
     public GameObject statsPanel;
     public DisplayCurrency displayCurrencyScript;
     Vector3 originalPosition;
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
         NewDay,
         Death,
         Retreat,
+        Upgrade,
     }
 
     public GameState currentState;
@@ -83,6 +85,9 @@ public class GameManager : MonoBehaviour
             case GameState.Retreat:
                 retreatPanel.SetActive(false);
                 break;
+            case GameState.Upgrade:
+                upgradePanel.SetActive(false);
+                break;
         }
     }
 
@@ -99,7 +104,7 @@ public class GameManager : MonoBehaviour
                 statsPanel.SetActive(true);
                 SpawnPlayer();
                 ActivatePlayer();
-                Weapon.instance.InstantiateWeapon();
+                Weapon.instance.InstantiateDefaultWeapon(0, playerInstance);
                 Invoke("ActivateHealthBar", 0.2f);
                 Time.timeScale = 1;
                 ChangeState(GameState.Playing);
@@ -135,6 +140,10 @@ public class GameManager : MonoBehaviour
                 CurrencySystem.BankCurrency();
                 retreatPanel.SetActive(true);
                 displayCurrencyScript.UpdateUI();
+                Time.timeScale = 0;
+                break;
+            case GameState.Upgrade:
+                upgradePanel.SetActive(true);
                 Time.timeScale = 0;
                 break;
         }
@@ -187,6 +196,11 @@ public class GameManager : MonoBehaviour
     public void StartNewDay()
     {
         ChangeState(GameState.NewDay);
+    }
+
+    public void ContinueToUpgrades()
+    {
+        ChangeState(GameState.Upgrade);
     }
 
     void SpawnPlayer()

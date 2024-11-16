@@ -14,22 +14,26 @@ public class CurrencySystem
         int earned = Random.Range(10, 100);
         currency += earned;
         earnedCurrency += earned;
+        Debug.Log("Currency added. Current currency: " + currency + ", Earned currency: " + earnedCurrency);
     }
 
     public static void BankCurrency()
     {
         bankedCurrency += currency;
+        Debug.Log("Banking currency. Banked currency: " + bankedCurrency);
         ResetCurrency();
     }
 
     public static void ResetCurrency()
     {
+        Debug.Log("Resetting currency. Previous currency: " + currency);
         currency = 0;
     }
 
     public static void ResetEarnedCurrency()
     {
         // Reset currency earned for the day.
+        Debug.Log("Resetting earned currency. Previous earned currency: " + earnedCurrency);
         earnedCurrency = 0;
     }
 }
