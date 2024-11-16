@@ -34,22 +34,36 @@ public class Weapon : MonoBehaviour
         reloadSpeed = 2;
         damage = 10;
         bulletSpeed = 20;
+    }
 
-        Vector3 weaponOffset = new Vector3(0, 0.5f, 0);
-        GameObject weaponInstance = Instantiate(weaponsList[0], player.transform.position - weaponOffset, player.transform.rotation);
-        currentWeapon = weaponInstance;
-        currentWeapon.transform.SetParent(player.transform);
+    public void InstantiateWeapon()
+    {
+        player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            Vector3 weaponOffset = new Vector3(0, 0.5f, 0);
+
+            // Instantiate the weapon at the player's position with an offset
+            GameObject weaponInstance = Instantiate(weaponsList[0], player.transform.position - weaponOffset, player.transform.rotation);
+
+            // Set the current weapon and parent it to the player
+            currentWeapon = weaponInstance;
+            currentWeapon.transform.SetParent(player.transform);
+        }
     }
 
     public void Shoot()
     {
+        Debug.Log("Shooting!");
         if (canShoot && !isReloading)
         {
             // Instantiate a bullet at the weapon's position and rotation.
-            GameObject bulletInstance = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            GameObject bulletInstance = Instantiate(bulletPrefab, currentWeapon.transform.position, 
+                player.transform.rotation);
 
             // Apply force to the bullet in the forward facing position.
-            bulletInstance.GetComponent<Rigidbody2D>().AddForce(-transform.up * bulletSpeed, ForceMode2D.Impulse);
+            Vector2 shootDirection = (player.transform.up  * -0.15f).normalized;
+            bulletInstance.GetComponent<Rigidbody2D>().AddForce(shootDirection * bulletSpeed, ForceMode2D.Impulse);
 
             capacity--;
         }

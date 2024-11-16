@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public GameObject retreatPanel;
     public GameObject statsPanel;
     public DisplayCurrency displayCurrencyScript;
+    Vector3 originalPosition;
 
     GameObject playerInstance;
 
@@ -75,9 +76,6 @@ public class GameManager : MonoBehaviour
                 statsPanel.SetActive(false);
                 break;
             case GameState.NewDay:
-                gunPanel.SetActive(false);
-                SpawnPlayer();
-                SpawnEnemies();
                 break;
             case GameState.Death:
                 deathPanel.SetActive(false);
@@ -101,10 +99,12 @@ public class GameManager : MonoBehaviour
                 statsPanel.SetActive(true);
                 SpawnPlayer();
                 ActivatePlayer();
+                Weapon.instance.InstantiateWeapon();
+                Invoke("ActivateHealthBar", 0.2f);
                 Time.timeScale = 1;
                 ChangeState(GameState.Playing);
                 break;
-            case GameState.Playing:          
+            case GameState.Playing:
                 SpawnEnemies();
                 Time.timeScale = 1;
                 break;
@@ -112,6 +112,7 @@ public class GameManager : MonoBehaviour
                 gunPanel.SetActive(true);
                 statsPanel.SetActive(true);
                 ActivatePlayer();
+                ActivateHealthBar();
                 SpawnEnemies();
                 CurrencySystem.ResetCurrency();
                 CurrencySystem.ResetEarnedCurrency();
@@ -119,16 +120,16 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 1;
                 break;
             case GameState.Death:
-                DeactivateHealthBar();
                 DeactivatePlayer();
+                DeactivateHealthBar();
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
                 deathPanel.SetActive(true);
                 Time.timeScale = 0;
                 break;
             case GameState.Retreat:
-                DeactivateHealthBar();
                 DeactivatePlayer();
+                DeactivateHealthBar();
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
                 CurrencySystem.BankCurrency();
@@ -144,6 +145,11 @@ public class GameManager : MonoBehaviour
         playerInstance.GetComponent<Player>().healthBarFill.enabled = false;
     }
 
+    void ActivateHealthBar()
+    {
+        playerInstance.GetComponent<Player>().healthBarFill.enabled = true;
+    }
+
     void DeactivateZombies(string tag)
     {
         GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
@@ -157,6 +163,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     public void PlayGame()
     {
         ChangeState(GameState.Init);
@@ -165,10 +172,14 @@ public class GameManager : MonoBehaviour
     public void ActivatePlayer()
     {
         playerInstance.SetActive(true);
+        playerInstance.GetComponent<Player>().enabled = true;
+        playerInstance.transform.position = originalPosition;
     }
 
     public void DeactivatePlayer()
     {
+        playerInstance.SetActive(false);
+        playerInstance.GetComponent<Player>().enabled = false;
         playerInstance.SetActive(false);
     }
 
@@ -180,6 +191,7 @@ public class GameManager : MonoBehaviour
     void SpawnPlayer()
     {
         playerInstance = Instantiate(playerPrefab);
+        originalPosition = playerInstance.transform.position;
     }
 
     void UpdateCurrencyText()

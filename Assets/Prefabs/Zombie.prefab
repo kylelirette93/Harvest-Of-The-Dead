@@ -23,7 +23,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1455353868250165175
 Transform:
   m_ObjectHideFlags: 0
@@ -104,15 +104,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthBarPrefab: {fileID: 8511738350632817641, guid: 49df56e8c2b5a5642b6689855ddbe5f7, type: 3}
-  healthBarFill: {fileID: 0}
   chaseSpeed: 2
-  healthBarFill: {fileID: 0}
-  healthBarPrefab: {fileID: 0}
+  healthBarFill: {fileID: 4233466437854892196, guid: 8e134b313a105c84186f109762beb365, type: 3}
   bloodParticles: {fileID: 7036814561741115123}
   playerTransform: {fileID: 6847594847219249852, guid: 491453233b3f1b44990fdc036eb725a4, type: 3}
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!61 &8910408801949117896
 BoxCollider2D:
   m_ObjectHideFlags: 0

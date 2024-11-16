@@ -7,13 +7,14 @@ using TMPro;
 
 public class Player : Actor
 {
+    public static Player instance;
     CurrencySystem currencySystem = new CurrencySystem();
     public TextMeshProUGUI currencyText;
 
     // References.
     Rigidbody2D rb;
     public Image healthBarFill;
-    public GameObject healthBarInstance;
+    public static GameObject healthBarInstance;
 
     // Variables.
     public float moveSpeed = 5f;
@@ -22,7 +23,20 @@ public class Player : Actor
     Vector2 moveDirection;
     Vector2 mousePosition;
     int currentHealth;
-    
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+       
+    }
+
 
     public override void Start()
     {
@@ -44,7 +58,10 @@ public class Player : Actor
         rb = GetComponent<Rigidbody2D>();
         fireCooldown = Weapon.instance.fireSpeed;
         currentHealth = healthSystem.currentHealth;
+
+
     }
+
 
     public override void Update()
     {
@@ -58,17 +75,17 @@ public class Player : Actor
         if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.25f)
         {
             // Health is 25% or lower
-            healthBarFill.color = Color.red; 
+            healthBarFill.color = Color.red;
         }
         else if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.5f)
         {
             // Health is 50% or lower
-            healthBarFill.color = Color.yellow; 
+            healthBarFill.color = Color.yellow;
         }
         else
         {
             // Health is above 50%
-            healthBarFill.color = Color.green; 
+            healthBarFill.color = Color.green;
         }
 
         timeSinceLastShot += Time.deltaTime;
@@ -111,6 +128,23 @@ public class Player : Actor
         {
             healthSystem.TakeDamage(10);
         }
+    }
+
+    public void SpawnHealthBar() 
+    {
+        healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
+        Transform healthBarTransform = healthBarInstance.transform;
+        currencyText = GameObject.Find("currencyText").GetComponent<TextMeshProUGUI>();
+
+        healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
+
+        Canvas healthCanvas = FindObjectOfType<Canvas>();
+        if (healthCanvas != null)
+        {
+            healthBarTransform.SetParent(healthCanvas.transform, false);
+        }
+        healthBarTransform.localScale = Vector3.one;
+
     }
 
     private void OnTriggerEnter2D(Collider2D other)

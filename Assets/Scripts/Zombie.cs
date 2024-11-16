@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,7 @@ public class Zombie : Actor
     public Transform playerTransform;
     BoxCollider2D zombieCollider;
     private DropItem dropItem;
+    private GameObject healthBarInstance;
 
     private enum ZombieState
     {
@@ -42,26 +44,39 @@ public class Zombie : Actor
         bloodParticles = GetComponent<ParticleSystem>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
 
-        GameObject healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
-        Transform healthBarTransform = healthBarInstance.transform;
-        healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
-        Canvas healthCanvas = FindObjectOfType<Canvas>();
-        if (healthCanvas != null)
+        if (healthBarInstance == null)
         {
-            healthBarTransform.SetParent(healthCanvas.transform, false);
+            Debug.Log("Creating health bar");
+            healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
+            Transform healthBarTransform = healthBarInstance.transform;
+
+            healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
+
+            Canvas healthCanvas = FindObjectOfType<Canvas>();
+            if (healthCanvas != null)
+            {
+                healthBarTransform.SetParent(healthCanvas.transform, false);
+            }
+            healthBarTransform.localScale = Vector3.one;
         }
-        healthBarTransform.localScale = Vector3.one;
-        healthBarInstance.SetActive(true);
+        else
+        {
+            Debug.Log("Reactivating health bar");
+            healthBarInstance.SetActive(true);
+        }
 
         UpdateZombieState();
     }
+
+   
 
     public override void Update()
     {
         base.Update();
 
-        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * 1.5f);
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up);
         healthBarFill.transform.position = screenPosition;
+        Debug.Log("Health bar fill position: " + healthBarFill.transform.position);
         healthBarFill.fillAmount = healthSystem.currentHealth / (float)healthSystem.maxHealth;
 
         if (healthSystem.currentHealth <= healthSystem.maxHealth * 0.25f)
