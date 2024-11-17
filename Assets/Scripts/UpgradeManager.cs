@@ -1,16 +1,24 @@
 using TMPro;
 using UnityEngine;
+using System.Collections;
 
 public class UpgradeManager : MonoBehaviour
 {
+    public int upgradePrice;
+    public string selectedWeaponId;
+
+
     public static UpgradeManager instance;
     public GameObject upgradeDamageButton;
     public GameObject upgradeReloadSpeedButton;
     public GameObject upgradeFireSpeedButton;
-    public string selectedWeaponId;
     public GameObject weaponSelectionPanel;
-    public int upgradePrice;
+
     public TextMeshProUGUI availableCurrencyText;
+    public TextMeshProUGUI upgradeDamageText;
+    public TextMeshProUGUI upgradeReloadSpeedText;
+    public TextMeshProUGUI upgradeFireSpeedText;
+    public TextMeshProUGUI selectedWeaponText;
 
     private void Awake()
     {
@@ -35,6 +43,7 @@ public class UpgradeManager : MonoBehaviour
     private void OnEnable()
     {
         ChangeState(UpgradeState.SelectWeapon);
+        UpdateAvailableCurrencyText();
     }
 
     public UpgradeState currentState;
@@ -42,10 +51,25 @@ public class UpgradeManager : MonoBehaviour
     void Start()
     {
         ChangeState(UpgradeState.SelectWeapon);
-        UpdateAvailableCurrencyText();
     }
 
-    
+    private void Update()
+    {
+        upgradeDamageText.text = "damage: " + Weapon.instance.damage;
+        upgradeReloadSpeedText.text = "reload speed: " + Weapon.instance.reloadSpeed;
+        upgradeFireSpeedText.text = "fire speed: " + Weapon.instance.fireSpeed;
+
+        if (WeaponManager.instance.GetSelectedWeaponData() == null)
+        {
+            selectedWeaponText.text = "upgrade: " + selectedWeaponId;
+        }
+        else
+        {
+            selectedWeaponText.text = "upgrade: " + WeaponManager.instance.GetSelectedWeaponData().weaponName;
+        }
+    }
+
+
 
     public void ChangeState(UpgradeState newState)
     {
@@ -71,7 +95,6 @@ public class UpgradeManager : MonoBehaviour
         switch (newState)
         {
             case UpgradeState.SelectWeapon:
-                weaponSelectionPanel.SetActive(true);
                 Time.timeScale = 0;
                 break;
             case UpgradeState.IncreaseHealth:
@@ -92,6 +115,12 @@ public class UpgradeManager : MonoBehaviour
         availableCurrencyText.text = "Available Funds: " + CurrencySystem.bankedCurrency;
     }
 
+    IEnumerator ResetAvailableText(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        availableCurrencyText.text = "Available Funds: " + CurrencySystem.bankedCurrency;
+    }
+
     public void OnUpgradeDamageButtonClicked(int upgradeCost)
     {
         upgradePrice = upgradeCost;
@@ -102,7 +131,7 @@ public class UpgradeManager : MonoBehaviour
             UpdateAvailableCurrencyText();
             Debug.Log("Currency deducted. New currency: " + CurrencySystem.bankedCurrency);
 
-            WeaponManager.instance.UpgradeDamage(1);
+            WeaponManager.instance.UpgradeDamage(2);
             if (Weapon.instance != null)
             {
                 Weapon.instance.ApplyUpgrades(WeaponManager.instance.GetSelectedWeaponData());
@@ -117,6 +146,7 @@ public class UpgradeManager : MonoBehaviour
         {
             availableCurrencyText.text = "Insufficient funds!";
             Debug.LogWarning("Insufficient funds for upgrade.");
+            StartCoroutine(ResetAvailableText(1.5f));
         }
     }
 
@@ -145,6 +175,7 @@ public class UpgradeManager : MonoBehaviour
         {
             availableCurrencyText.text = "Insufficient funds!";
             Debug.LogWarning("Insufficient funds for upgrade.");
+            StartCoroutine(ResetAvailableText(1.5f));
         }
     }
 
@@ -158,7 +189,7 @@ public class UpgradeManager : MonoBehaviour
             UpdateAvailableCurrencyText();
             Debug.Log("Currency deducted. New currency: " + CurrencySystem.bankedCurrency);
 
-            WeaponManager.instance.UpgradeFireSpeed(0.9f);
+            WeaponManager.instance.UpgradeFireSpeed(0.25f);
             if (Weapon.instance != null)
             {
                 Weapon.instance.ApplyUpgrades(WeaponManager.instance.GetSelectedWeaponData());
@@ -173,6 +204,7 @@ public class UpgradeManager : MonoBehaviour
         {
             availableCurrencyText.text = "Insufficient funds!";
             Debug.LogWarning("Insufficient funds for upgrade.");
+            StartCoroutine(ResetAvailableText(1.5f));
         }
     }
 }

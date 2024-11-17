@@ -5,10 +5,9 @@ public class Weapon : MonoBehaviour
 {
     public static Weapon instance;
 
-    string weaponId;
     int capacity;
     int maxCapacity;
-    public int reloadSpeed;
+    public float reloadSpeed = 2;
     public float fireSpeed = 0.25f;
     public int damage;
     int bulletSpeed;
@@ -65,7 +64,6 @@ public class Weapon : MonoBehaviour
             // Set the current weapon and parent it to the player
             currentWeapon = weaponInstance;
             currentWeapon.transform.SetParent(player.transform);
-            weaponId = "1";
         }
     }
 
@@ -85,7 +83,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    IEnumerator Reload(int delay)
+    IEnumerator Reload(float delay)
     {
         isReloading = true;
         yield return new WaitForSeconds(delay);
@@ -99,14 +97,15 @@ public class Weapon : MonoBehaviour
         damage += additionalDamage;
     }
 
-    public void UpgradeReloadSpeed(float reloadSpeedMultiplier)
+    public void UpgradeReloadSpeed()
     {
-        reloadSpeed = Mathf.Max(1, (int)(reloadSpeed * reloadSpeedMultiplier));
+        reloadSpeed = Mathf.Max(1, reloadSpeed - 0.2f);
+        Debug.Log("Upgraded reload speed: " + reloadSpeed);
     }
 
-    public void UpgradeFireSpeed(float fireSpeedMultiplier)
+    public void UpgradeFireSpeed(float fireSpeedIncrease)
     {
-        fireSpeed *= fireSpeedMultiplier;
+        fireSpeed += fireSpeedIncrease;
     }
 
     public void ApplyUpgrades(WeaponData weaponData)

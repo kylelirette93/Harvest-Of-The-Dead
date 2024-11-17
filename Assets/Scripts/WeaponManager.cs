@@ -56,23 +56,38 @@ public class WeaponManager : MonoBehaviour
             selectedWeapon.damage += additionalDamage;
             Debug.Log("Upgraded damage: " + selectedWeapon.damage);
         }
+        else
+        {
+            // Set pistol as default weapon if no weapon is selected.
+            selectedWeapon = weaponsList[0];
+        }
     }
 
     public void UpgradeReloadSpeed(float reloadSpeedMultiplier)
     {
         if (selectedWeapon != null)
         {
-            selectedWeapon.reloadSpeed = Mathf.Max(1, (int)(selectedWeapon.reloadSpeed * reloadSpeedMultiplier));
+            selectedWeapon.reloadSpeed = Mathf.Max(1, selectedWeapon.reloadSpeed - 0.2f);
             Debug.Log("Upgraded reload speed: " + selectedWeapon.reloadSpeed);
+        }
+        else
+        {
+            // Set pistol as default weapon if no weapon is selected.
+            selectedWeapon = weaponsList[0];
         }
     }
 
-    public void UpgradeFireSpeed(float fireSpeedMultiplier)
+    public void UpgradeFireSpeed(float fireSpeedIncrease)
     {
         if (selectedWeapon != null)
         {
-            selectedWeapon.fireSpeed *= fireSpeedMultiplier;
+            selectedWeapon.fireSpeed += fireSpeedIncrease;
             Debug.Log("Upgraded fire speed: " + selectedWeapon.fireSpeed);
+        }
+        else
+        {
+            // Set pistol as default weapon if no weapon is selected.
+            selectedWeapon = weaponsList[0];
         }
     }
 
@@ -88,6 +103,6 @@ public class WeaponData
     public string weaponId;
     public string weaponName;
     public int damage;
-    public int reloadSpeed;
+    public float reloadSpeed;
     public float fireSpeed;
 }

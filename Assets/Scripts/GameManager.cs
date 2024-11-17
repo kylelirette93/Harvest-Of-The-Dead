@@ -118,6 +118,7 @@ public class GameManager : MonoBehaviour
                 statsPanel.SetActive(true);
                 ActivatePlayer();
                 ActivateHealthBar();
+                DeactivateZombies("Zombie");
                 SpawnEnemies();
                 CurrencySystem.ResetCurrency();
                 CurrencySystem.ResetEarnedCurrency();
@@ -167,7 +168,7 @@ public class GameManager : MonoBehaviour
             Zombie zombie = obj.GetComponent<Zombie>();
             if (zombie != null)
             {
-                zombie.chaseSpeed = 2;
+                zombie.chaseSpeed = 1.5f;
                 zombie.DeactivateZombie();
             }
         }
@@ -219,12 +220,12 @@ public class GameManager : MonoBehaviour
     void SpawnEnemies()
     {
         spawnManagerScript.enabled = true;
-        spawnManagerScript.globalChaseSpeed = 1.5f;
-        spawnManagerScript.spawnDelay = 5f;
     }
 
     void DespawnEnemies()
     {
+        spawnManagerScript.globalChaseSpeed = 1.5f;
+        spawnManagerScript.spawnDelay = 5f;
         spawnManagerScript.enabled = false;
     }
 
