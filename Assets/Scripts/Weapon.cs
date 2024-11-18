@@ -94,18 +94,39 @@ public class Weapon : MonoBehaviour
 
     public void UpgradeDamage(int additionalDamage)
     {
-        damage += additionalDamage;
+        if (damage < 20)
+        {
+            damage += additionalDamage;
+        }
+        else
+        {
+            UpgradeManager.instance.upgradeDamageText.text = "Maxed Out!";
+        }
     }
 
     public void UpgradeReloadSpeed()
     {
-        reloadSpeed = Mathf.Max(1, reloadSpeed - 0.2f);
-        Debug.Log("Upgraded reload speed: " + reloadSpeed);
+        if (reloadSpeed > 1)
+        {
+            reloadSpeed = Mathf.Max(1, reloadSpeed - 0.2f);
+            Debug.Log("Upgraded reload speed: " + reloadSpeed);
+        }
+        else
+        {
+            UpgradeManager.instance.upgradeReloadSpeedText.text = "Maxed Out!";
+        }
     }
 
     public void UpgradeFireSpeed(float fireSpeedIncrease)
     {
-        fireSpeed += fireSpeedIncrease;
+        if (fireSpeed < 1)
+        {
+            fireSpeed += fireSpeedIncrease;
+        }
+        else
+        {
+            UpgradeManager.instance.upgradeFireSpeedText.text = "Maxed Out!";
+        }
     }
 
     public void ApplyUpgrades(WeaponData weaponData)

@@ -37,8 +37,12 @@ public class Player : Actor
         else
         {
             Destroy(gameObject);
-        }
-       
+        }      
+    }
+
+    private void OnEnable()
+    {
+        healthSystem.Heal(100);
     }
 
 
@@ -113,6 +117,12 @@ public class Player : Actor
         Vector3 currentPosition = transform.position;
         currentPosition.x = Mathf.Clamp(currentPosition.x, mapMinX, mapMaxX);
         currentPosition.y = Mathf.Clamp(currentPosition.y, mapMinY, mapMaxY);
+
+        // Check for pause button press.
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameManager.instance.Pause();
+        }
     }
 
     void FixedUpdate()
@@ -189,7 +199,7 @@ public class Player : Actor
     public override void Die()
     {
         gameObject.SetActive(false);
-        healthSystem.Heal(healthSystem.maxHealth);
+        healthSystem.Heal(100);
         GameManager.instance.ChangeState(GameManager.GameState.Death);
     }
 }

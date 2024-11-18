@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -20,6 +19,7 @@ public class GameManager : MonoBehaviour
     public GameObject retreatPanel;
     public GameObject upgradePanel;
     public GameObject statsPanel;
+    public GameObject pausePanel;
     public DisplayCurrency displayCurrencyScript;
     Vector3 originalPosition;
 
@@ -179,6 +179,21 @@ public class GameManager : MonoBehaviour
     {
         ChangeState(GameState.Init);
     }
+
+    public void Pause()
+    {
+        pausePanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void Unpause()
+    {
+        pausePanel.SetActive(false);
+        Time.timeScale = 1;
+    }
+
+   
+
 
     public void ActivatePlayer()
     {
