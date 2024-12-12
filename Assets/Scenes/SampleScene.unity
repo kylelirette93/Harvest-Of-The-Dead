@@ -8015,6 +8015,7 @@ MonoBehaviour:
   weaponsList:
   - {fileID: 346593322724738094, guid: 29df0aae5e668f04e976fb21f8a73ea3, type: 3}
   bulletPrefab: {fileID: 7211225275976456693, guid: 21908b66dbeb9c741977d31d99d66346, type: 3}
+  muzzleFlashPrefab: {fileID: 7487742868489412596, guid: c299bf537cd3eda418708789b18c666b, type: 3}
 --- !u!4 &497328654
 Transform:
   m_ObjectHideFlags: 0

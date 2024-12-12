@@ -19,6 +19,13 @@ public class Weapon : MonoBehaviour
     GameObject currentWeapon;
     public GameObject bulletPrefab;
 
+    GameObject muzzleFlashInstance;
+    public GameObject muzzleFlashPrefab;
+    Transform muzzleFlashPoint;
+    string muzzleFlashTag = "MuzzleFlashPoint";
+
+    AudioSource shootSound;
+
     private void Awake()
     {
         if (instance == null)
@@ -39,7 +46,7 @@ public class Weapon : MonoBehaviour
         maxCapacity = capacity;
         reloadSpeed = 2;
         damage = 10;
-        bulletSpeed = 20;
+        bulletSpeed = 50;
 
         // Add the pistol to weapon inventory by default.
         WeaponManager.instance.AddWeapon(weaponsList[0]);
@@ -64,22 +71,55 @@ public class Weapon : MonoBehaviour
             // Set the current weapon and parent it to the player
             currentWeapon = weaponInstance;
             currentWeapon.transform.SetParent(player.transform);
+
+            shootSound = currentWeapon.GetComponent<AudioSource>();
+
+            // Assign current weapon's muzzle flash point to the muzzle flash point variable.
+            muzzleFlashPoint = currentWeapon.transform.Find(muzzleFlashTag);
+
+            // Instantiate muzzle flash prefab at the weapon's muzzle flash point.
+            muzzleFlashInstance = Instantiate(muzzleFlashPrefab, muzzleFlashPoint.transform.position, muzzleFlashPoint.transform.rotation);
+            muzzleFlashInstance.transform.SetParent(currentWeapon.transform);
+
+            // Deactivate the muzzle flash instance.
+            muzzleFlashInstance.SetActive(false);
+            // Instantiate muzzle flash prefab at the weapon's muzzle flash point.
         }
     }
 
     public void Shoot()
     {
-        Debug.Log("Shooting!");
         if (canShoot && !isReloading)
         {
+            shootSound.Play();
             // Instantiate a bullet at the weapon's position and rotation.
             GameObject bulletInstance = Instantiate(bulletPrefab, currentWeapon.transform.position, player.transform.rotation);
+
+            // Do a muzzle flash effect.
+            muzzleFlashInstance.SetActive(true);
+            Debug.Log("Muzzle flash effect activated");
 
             // Apply force to the bullet in the forward facing position.
             Vector2 shootDirection = (currentWeapon.transform.up * -0.125f).normalized;
             bulletInstance.GetComponent<Rigidbody2D>().AddForce(shootDirection * bulletSpeed, ForceMode2D.Impulse);
 
+            StartCoroutine(DeactivateMuzzleFlash());
+
             capacity--;
+        }
+    }
+
+    private IEnumerator DeactivateMuzzleFlash()
+    {
+        yield return new WaitForSeconds(0.1f); // Adjust the delay as needed
+        if (muzzleFlashInstance != null)
+        {
+            Debug.Log("Deactivating muzzle flash");
+            muzzleFlashInstance.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("Muzzle flash instance is null");
         }
     }
 
