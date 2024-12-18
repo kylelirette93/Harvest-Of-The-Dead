@@ -4,12 +4,15 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    public GameObject studioNamePanel;
+    public VideoPlayer studioNameVideoPlayer;
     public GameObject mainMenuPanel;
     public GameObject gunPanel;
     public GameObject graveyardPrefab;
@@ -20,10 +23,17 @@ public class GameManager : MonoBehaviour
     public GameObject upgradePanel;
     public GameObject statsPanel;
     public GameObject pausePanel;
+    public GameObject blackScreen;
     public DisplayCurrency displayCurrencyScript;
     Vector3 originalPosition;
+    public int CurrentDay { get; private set; } = 1;
 
     GameObject playerInstance;
+
+    public AudioClip menuMusic;
+    public AudioClip gamePlayMusic;
+    public AudioClip upgradeMusic;
+    private AudioSource audioSource;
 
     void Awake()
     {
@@ -35,10 +45,13 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     public enum GameState
     {
+        StudioName,
         MainMenu,
         Init,
         Playing,
@@ -52,7 +65,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        ChangeState(GameState.MainMenu);
+        CurrentDay = 1;
+        ChangeState(GameState.StudioName);
     }
 
     public void ChangeState(GameState newState)
@@ -68,14 +82,19 @@ public class GameManager : MonoBehaviour
     {
         switch (state)
         {
+            case GameState.StudioName:
+                studioNamePanel.SetActive(false);
+                break;
             case GameState.MainMenu:
                 mainMenuPanel.SetActive(false);
+                StopMusic();
                 break;
             case GameState.Init:
                 break;
             case GameState.Playing:
                 gunPanel.SetActive(false);
                 statsPanel.SetActive(false);
+                StopMusic();
                 break;
             case GameState.NewDay:
                 break;
@@ -87,6 +106,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Upgrade:
                 upgradePanel.SetActive(false);
+                StopMusic();
                 break;
         }
     }
@@ -95,16 +115,23 @@ public class GameManager : MonoBehaviour
     {
         switch (state)
         {
+            case GameState.StudioName:
+                studioNamePanel.SetActive(true);
+                studioNameVideoPlayer.Play();
+                Invoke("TransitionToMainMenu", (float)studioNameVideoPlayer.clip.length);
+                Invoke("DisableBlackScreen", 0.4f);
+                break;
             case GameState.MainMenu:
                 mainMenuPanel.SetActive(true);
                 Time.timeScale = 0;
+                PlayMusic(menuMusic);
                 break;
             case GameState.Init:
                 gunPanel.SetActive(true);
                 statsPanel.SetActive(true);
                 SpawnPlayer();
                 ActivatePlayer();
-                Weapon.instance.InstantiateDefaultWeapon(0, playerInstance);
+                Weapon.instance.InstantiateWeapon(0);
                 Invoke("ActivateHealthBar", 0.2f);
                 Time.timeScale = 1;
                 ChangeState(GameState.Playing);
@@ -112,8 +139,11 @@ public class GameManager : MonoBehaviour
             case GameState.Playing:
                 SpawnEnemies();
                 Time.timeScale = 1;
+                PlayMusic(gamePlayMusic);
                 break;
             case GameState.NewDay:
+                AdvanceDay();
+                RefillAmmunition();
                 gunPanel.SetActive(true);
                 statsPanel.SetActive(true);
                 ActivatePlayer();
@@ -123,9 +153,12 @@ public class GameManager : MonoBehaviour
                 CurrencySystem.ResetCurrency();
                 CurrencySystem.ResetEarnedCurrency();
                 UpdateCurrencyText();
+                WeaponManager.instance.UpdatePlayerWeapon();
                 Time.timeScale = 1;
+                PlayMusic(gamePlayMusic);
                 break;
             case GameState.Death:
+                statsPanel.SetActive(false);
                 DeactivatePlayer();
                 DeactivateHealthBar();
                 DespawnEnemies();
@@ -134,6 +167,8 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0;
                 break;
             case GameState.Retreat:
+                PlayMusic(upgradeMusic);
+                Weapon.instance.StopReload();
                 DeactivatePlayer();
                 DeactivateHealthBar();
                 DespawnEnemies();
@@ -141,6 +176,7 @@ public class GameManager : MonoBehaviour
                 CurrencySystem.BankCurrency();
                 retreatPanel.SetActive(true);
                 displayCurrencyScript.UpdateUI();
+                statsPanel.SetActive(false);
                 Time.timeScale = 0;
                 break;
             case GameState.Upgrade:
@@ -148,6 +184,36 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0;
                 break;
         }
+    }
+
+    void TransitionToMainMenu()
+    {
+        ChangeState(GameState.MainMenu);
+    }
+
+    void DisableBlackScreen()
+    {
+
+       blackScreen.SetActive(false);
+    }
+    void PlayMusic(AudioClip clip)
+    {
+        if (audioSource.clip != clip)
+        {
+            audioSource.clip = clip;
+            audioSource.Play();
+        }
+    }
+
+    void StopMusic()
+    {
+        audioSource.Stop();
+    }
+
+    void RefillAmmunition()
+    {
+        Weapon.instance.weaponAmmo[Weapon.WeaponType.Pistol] = 10;
+        Weapon.instance.weaponAmmo[Weapon.WeaponType.Shotgun] = 6;
     }
 
     void DeactivateHealthBar()
@@ -192,7 +258,11 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
     }
 
-   
+    public void AdvanceDay()
+    {
+        CurrentDay++;
+        WeaponManager.instance.CheckForUnlockedWeapons(CurrentDay);
+    }
 
 
     public void ActivatePlayer()
@@ -211,6 +281,7 @@ public class GameManager : MonoBehaviour
 
     public void StartNewDay()
     {
+        WeaponManager.instance.SelectWeaponById(Player.instance.savedWeaponData.weaponId);
         ChangeState(GameState.NewDay);
     }
 

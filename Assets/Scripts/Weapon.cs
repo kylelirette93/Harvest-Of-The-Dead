@@ -1,5 +1,10 @@
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Rendering;
+using System.Threading;
 
 public class Weapon : MonoBehaviour
 {
@@ -7,22 +12,46 @@ public class Weapon : MonoBehaviour
 
     int capacity;
     int maxCapacity;
-    public float reloadSpeed = 2;
-    public float fireSpeed = 0.25f;
-    public int damage;
-    int bulletSpeed;
+    public float reloadSpeed;
+    public float fireSpeed;
+    public float damage;
+    private float damageUpgrade = 0;
+    private float reloadSpeedUpgrade = 0;
+    private float fireSpeedUpgrade = 0;
+    int bulletSpeed = 50;
     bool canShoot = true;
     bool isReloading = false;
 
     public GameObject player;
     public GameObject[] weaponsList;
-    GameObject currentWeapon;
+    public GameObject currentWeapon;
     public GameObject bulletPrefab;
 
     GameObject muzzleFlashInstance;
     public GameObject muzzleFlashPrefab;
     Transform muzzleFlashPoint;
     string muzzleFlashTag = "MuzzleFlashPoint";
+
+    private Vector3[] weaponOffsets;
+    private Quaternion[] localRotations;
+
+    private bool isShotgunPurchased = false;
+
+    private WeaponData currentWeaponData;
+
+    public Dictionary<WeaponType, int> weaponAmmo = new Dictionary<WeaponType, int>();
+    public Dictionary<WeaponType, int> maxWeaponAmmo = new Dictionary<WeaponType, int>();
+
+    public TextMeshProUGUI reloadingText;
+    public Slider reloadProgressBar;
+
+    public enum WeaponType
+    {
+        Pistol,
+        Shotgun
+    }
+
+    public WeaponType weaponType;
 
     AudioSource shootSound;
 
@@ -41,23 +70,41 @@ public class Weapon : MonoBehaviour
 
     public virtual void Start()
     {
-        // Initialize variables to default(pistol).
-        capacity = 10;
-        maxCapacity = capacity;
-        reloadSpeed = 2;
-        damage = 10;
-        bulletSpeed = 50;
+        weaponOffsets = new Vector3[weaponsList.Length];
+        weaponOffsets[0] = new Vector3(0, -0.5f, 0); // Pistol offset
+        weaponOffsets[1] = new Vector3(0, -0.5f, 0); // Shotgun offset
 
-        // Add the pistol to weapon inventory by default.
+        localRotations = new Quaternion[weaponsList.Length];
+        localRotations[0] = Quaternion.Euler(0, 0, 0); // Pistol rotation
+        localRotations[1] = Quaternion.Euler(0, 0, -90); // Shotgun rotation
+
+        weaponAmmo[WeaponType.Pistol] = 10; // Initial ammo for Pistol
+        maxWeaponAmmo[WeaponType.Pistol] = 10; // Max ammo for Pistol
+
+        weaponAmmo[WeaponType.Shotgun] = 6; // Initial ammo for Shotgun
+        maxWeaponAmmo[WeaponType.Shotgun] = 6; // Max ammo for Shotgun
+
         WeaponManager.instance.AddWeapon(weaponsList[0]);
     }
 
-    public void InstantiateDefaultWeapon(int index, GameObject player)
+    public WeaponData GetCurrentWeaponData()
+    {
+        return currentWeaponData;
+    }
+
+    public void SetCurrentWeaponData(WeaponData weaponData)
+    {
+        currentWeaponData = weaponData;
+        ApplyUpgrades(weaponData);
+    }
+
+    public void InstantiateWeapon(int index)
     {
         player = GameObject.FindGameObjectWithTag("Player");
         if (player != null && index >= 0 && index < weaponsList.Length)
         {
-            Vector3 weaponOffset = new Vector3(0, 0.5f, 0);
+            Vector3 weaponOffset = weaponOffsets[index];
+            Quaternion localRotation = localRotations[index];
 
             if (currentWeapon != null)
             {
@@ -65,12 +112,24 @@ public class Weapon : MonoBehaviour
                 Destroy(currentWeapon);
             }
 
-            // Instantiate the weapon at the player's position with an offset
-            GameObject weaponInstance = Instantiate(weaponsList[index], player.transform.position - weaponOffset, player.transform.rotation);
+            // Instantiate the selected weapon at the player's position with an offset
+            GameObject weaponInstance = Instantiate(weaponsList[index], player.transform.position, player.transform.rotation);
 
             // Set the current weapon and parent it to the player
             currentWeapon = weaponInstance;
             currentWeapon.transform.SetParent(player.transform);
+
+            currentWeapon.transform.localPosition = weaponOffset;
+            currentWeapon.transform.localRotation = localRotation;
+
+            if (index == 0)
+            {
+                weaponType = WeaponType.Pistol;
+            }
+            else if (index == 1)
+            {
+                weaponType = WeaponType.Shotgun;
+            }
 
             shootSound = currentWeapon.GetComponent<AudioSource>();
 
@@ -81,32 +140,145 @@ public class Weapon : MonoBehaviour
             muzzleFlashInstance = Instantiate(muzzleFlashPrefab, muzzleFlashPoint.transform.position, muzzleFlashPoint.transform.rotation);
             muzzleFlashInstance.transform.SetParent(currentWeapon.transform);
 
-            // Deactivate the muzzle flash instance.
+            // Deactivate the muzzle flash instance initially
             muzzleFlashInstance.SetActive(false);
-            // Instantiate muzzle flash prefab at the weapon's muzzle flash point.
+
+            WeaponData weaponData = WeaponManager.instance.GetWeaponDataById(weaponsList[index].name);
+            if (weaponData != null)
+            {
+                SetWeaponData(weaponData);
+            }
+            else
+            {
+                Debug.LogWarning("Weapon data not found for: " + weaponsList[index].name);
+            }
         }
     }
+
+    public void ResetWeaponData()
+    {
+        if (currentWeapon != null)
+        {
+            WeaponData weaponData = WeaponManager.instance.GetWeaponDataById(currentWeapon.name);
+            if (weaponData != null)
+            {
+                Debug.Log("Resetting weapon data for: " + currentWeapon.name);
+                ApplyUpgrades(weaponData);
+            }
+            else
+            {
+                Debug.LogWarning("Weapon data not found for: " + currentWeapon.name);
+            }
+        }
+    }
+
+    public void SetWeaponData(WeaponData weaponData)
+    {
+        currentWeaponData = weaponData;
+        this.damage = weaponData.damage;
+        this.reloadSpeed = weaponData.reloadSpeed;
+        this.fireSpeed = weaponData.fireSpeed;
+        Debug.Log($"Weapon data set to: {weaponData.weaponName}");
+    }
+
+    public void SwitchWeapon(int weaponIndex)
+    {
+        if (weaponIndex == 1 && !isShotgunPurchased) return;
+
+        if (weaponIndex >= 0 && weaponIndex < weaponsList.Length)
+        {
+            InstantiateWeapon(weaponIndex);
+            weaponType = (WeaponType)weaponIndex; // Set the new weapon type
+        }
+        else
+        {
+            Debug.LogError("Weapon index out of range");
+        }
+    }
+
 
     public void Shoot()
     {
         if (canShoot && !isReloading)
         {
-            shootSound.Play();
-            // Instantiate a bullet at the weapon's position and rotation.
-            GameObject bulletInstance = Instantiate(bulletPrefab, currentWeapon.transform.position, player.transform.rotation);
+            if (weaponAmmo[weaponType] > 0)
+            {
+                shootSound.Play();
 
-            // Do a muzzle flash effect.
-            muzzleFlashInstance.SetActive(true);
-            Debug.Log("Muzzle flash effect activated");
+                Vector2[] shootDirections = GetShootDirections();
+                float adjustedBulletSpeed = weaponType == WeaponType.Pistol ? bulletSpeed * 5f : bulletSpeed;
 
-            // Apply force to the bullet in the forward facing position.
-            Vector2 shootDirection = (currentWeapon.transform.up * -0.125f).normalized;
-            bulletInstance.GetComponent<Rigidbody2D>().AddForce(shootDirection * bulletSpeed, ForceMode2D.Impulse);
+                foreach (Vector2 shootDirection in shootDirections)
+                {
+                    Vector3 bulletSpawnPosition = currentWeapon.transform.position + (Vector3)shootDirection.normalized * 1f;
+                    GameObject bulletInstance = Instantiate(bulletPrefab, bulletSpawnPosition, player.transform.rotation);
+                    bulletInstance.GetComponent<Rigidbody2D>().AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
+                }
 
-            StartCoroutine(DeactivateMuzzleFlash());
+                muzzleFlashInstance.SetActive(true);
+                Debug.Log("Muzzle flash effect activated");
 
-            capacity--;
+                StartCoroutine(DeactivateMuzzleFlash());
+
+                weaponAmmo[weaponType]--; // Decrease ammo for the current weapon
+                StartCoroutine(FireDelay());
+
+                if (weaponAmmo[weaponType] <= 0)
+                {
+                    canShoot = false; // Disable shooting when out of ammo
+                    StartCoroutine(InitiateReload(0.2f)); // Start the reload process
+                }
+            }
+            else
+            {
+                Debug.Log("Out of ammo! Reload required.");
+                StartCoroutine(InitiateReload(0.2f)); // Start the reload process if out of ammo
+            }
         }
+    }
+
+    IEnumerator InitiateReload(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (!isReloading && weaponAmmo[weaponType] < maxWeaponAmmo[weaponType])
+        {
+            StartCoroutine(Reload(reloadSpeed));
+        }
+    }
+    Vector2[] GetShootDirections()
+    {
+        if (weaponType == WeaponType.Shotgun)
+        {
+            Debug.Log("Shooting spread shot.");
+            float angleStep = 10f; // Adjust this value to control the spread
+            Vector2[] directions = new Vector2[5];
+
+            for (int i = 0; i < directions.Length; i++)
+            {
+                // Adjust the angle for the spread shot
+                float angle = currentWeapon.transform.eulerAngles.z + (angleStep * (i - 2)); // Offset angles for spread
+
+                // Calculate the shoot direction
+                directions[i] = new Vector2(Mathf.Cos(Mathf.Deg2Rad * angle), Mathf.Sin(Mathf.Deg2Rad * angle));
+            }
+
+            return directions;
+        }
+        else if (weaponType == WeaponType.Pistol)
+        {
+            return new Vector2[] { currentWeapon.transform.up * -0.125f };
+        }
+        else
+        {
+            Debug.Log("No weapon found.");
+            return new Vector2[0];
+        }
+    }
+    private IEnumerator FireDelay()
+    {
+        canShoot = false;
+        yield return new WaitForSeconds(fireSpeed);
+        canShoot = true;
     }
 
     private IEnumerator DeactivateMuzzleFlash()
@@ -126,17 +298,64 @@ public class Weapon : MonoBehaviour
     IEnumerator Reload(float delay)
     {
         isReloading = true;
-        yield return new WaitForSeconds(delay);
-        capacity = maxCapacity;
+        reloadingText.gameObject.SetActive(true);
+        reloadProgressBar.gameObject.SetActive(true);
+        reloadProgressBar.value = 0;
+
+        // Access the TextMeshPro material
+        Material reloadingTextMaterial = reloadingText.fontMaterial;
+
+        // Define two colors for the ping-pong effect
+        Color startColor = Color.grey;
+        Color endColor = Color.red;
+
+        float elapsedTime = 0;
+        while (elapsedTime < delay)
+        {
+            if (!isReloading)
+            {
+                reloadingText.gameObject.SetActive(false);
+                reloadProgressBar.gameObject.SetActive(false);
+                yield break;
+            }
+            elapsedTime += Time.deltaTime;
+            reloadProgressBar.value = Mathf.Clamp01(elapsedTime / delay);
+
+            // Subtle ping-pong effect for the face dilate property
+            float faceDilate = Mathf.PingPong(elapsedTime * 0.5f, 0.2f); // Adjust the speed and range for subtle effect
+            reloadingTextMaterial.SetFloat(ShaderUtilities.ID_FaceDilate, faceDilate);
+
+            // Ping-pong effect for the color
+            float t = Mathf.PingPong(elapsedTime, 0.5f);
+            reloadingTextMaterial.SetColor(ShaderUtilities.ID_FaceColor, Color.Lerp(startColor, endColor, t));
+
+            yield return null;
+        }
+
+        weaponAmmo[weaponType] = maxWeaponAmmo[weaponType]; // Reload only the current weapon's ammo
         isReloading = false;
         canShoot = true;
+
+        reloadingText.gameObject.SetActive(false);
+        reloadProgressBar.gameObject.SetActive(false);
+
+        // Reset the face dilate property and color
+        reloadingTextMaterial.SetFloat(ShaderUtilities.ID_FaceDilate, 0);
+        reloadingTextMaterial.SetColor(ShaderUtilities.ID_FaceColor, startColor);
+    }
+
+    public void StopReload()
+    {
+        isReloading = false;
     }
 
     public void UpgradeDamage(int additionalDamage)
     {
-        if (damage < 20)
+        WeaponData weaponData = WeaponManager.instance.GetWeaponDataById(currentWeapon.name);
+        if (weaponData != null && damage < weaponData.maxDamage)
         {
-            damage += additionalDamage;
+            damageUpgrade = Mathf.Min(damageUpgrade + additionalDamage, weaponData.maxDamage - weaponData.damage);
+            ApplyUpgrades(weaponData);
         }
         else
         {
@@ -146,9 +365,11 @@ public class Weapon : MonoBehaviour
 
     public void UpgradeReloadSpeed()
     {
-        if (reloadSpeed > 1)
+        WeaponData weaponData = WeaponManager.instance.GetWeaponDataById(currentWeapon.name);
+        if (weaponData != null && reloadSpeed > weaponData.minReloadSpeed)
         {
-            reloadSpeed = Mathf.Max(1, reloadSpeed - 0.2f);
+            reloadSpeedUpgrade = Mathf.Min(reloadSpeedUpgrade + 0.2f, weaponData.reloadSpeed - weaponData.minReloadSpeed);
+            ApplyUpgrades(weaponData);
             Debug.Log("Upgraded reload speed: " + reloadSpeed);
         }
         else
@@ -159,9 +380,11 @@ public class Weapon : MonoBehaviour
 
     public void UpgradeFireSpeed(float fireSpeedIncrease)
     {
-        if (fireSpeed < 1)
+        WeaponData weaponData = WeaponManager.instance.GetWeaponDataById(currentWeapon.name);
+        if (weaponData != null && fireSpeed > weaponData.minFireSpeed)
         {
-            fireSpeed += fireSpeedIncrease;
+            fireSpeedUpgrade = Mathf.Min(fireSpeedUpgrade + fireSpeedIncrease, weaponData.fireSpeed - weaponData.minFireSpeed);
+            ApplyUpgrades(weaponData);
         }
         else
         {
@@ -173,17 +396,22 @@ public class Weapon : MonoBehaviour
     {
         if (weaponData != null)
         {
-           damage = weaponData.damage;
-           reloadSpeed = weaponData.reloadSpeed;
-           fireSpeed = weaponData.fireSpeed;
+            damage = weaponData.damage + damageUpgrade;
+            reloadSpeed = weaponData.reloadSpeed - reloadSpeedUpgrade;
+            fireSpeed = weaponData.fireSpeed - fireSpeedUpgrade;
         }
     }
     public virtual void Update()
     {
-        if (capacity <= 0 && !isReloading)
+        // Allow shooting if the weapon is ready and ammo is available
+        if (!isReloading && weaponAmmo[weaponType] > 0)
         {
-            canShoot = false;
-            StartCoroutine(Reload(reloadSpeed));
+            canShoot = true;
         }
+    }
+
+    public void PurchaseShotgun()
+    {
+        isShotgunPurchased = true;
     }
 }

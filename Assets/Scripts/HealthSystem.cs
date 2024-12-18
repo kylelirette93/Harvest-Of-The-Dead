@@ -20,9 +20,9 @@ public class HealthSystem
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage(int dmg)
+    public void TakeDamage(float dmg)
     {
-        currentHealth -= dmg;
+        currentHealth -= (int)dmg;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
     }

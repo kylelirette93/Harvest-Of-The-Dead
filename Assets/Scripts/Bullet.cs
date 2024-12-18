@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour 
 {
-    int bulletDamage;
+    float bulletDamage;
     LineRenderer lineRenderer;
     List<Vector3> positions = new List<Vector3>();
 

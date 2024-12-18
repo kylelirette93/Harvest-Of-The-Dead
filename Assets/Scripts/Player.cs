@@ -10,6 +10,8 @@ public class Player : Actor
     public static Player instance;
     CurrencySystem currencySystem = new CurrencySystem();
     public TextMeshProUGUI currencyText;
+    public TextMeshProUGUI bankedCurrencyText;
+    public TextMeshProUGUI dayText;
 
     // References.
     Rigidbody2D rb;
@@ -40,9 +42,32 @@ public class Player : Actor
         }      
     }
 
+    public WeaponData savedWeaponData;
+
+    private void OnDisable()
+    {
+        // Save the current weapon data when the player is disabled
+        if (Weapon.instance != null)
+        {
+            savedWeaponData = Weapon.instance.GetCurrentWeaponData();
+        }
+    }
+
     private void OnEnable()
     {
-        healthSystem.Heal(100);
+        if (healthSystem != null)
+        {
+            healthSystem.Heal(100);
+        }
+        if (savedWeaponData != null && Weapon.instance != null)
+        {
+            Weapon.instance.SetWeaponData(savedWeaponData);
+        }
+
+        if (dayText != null && GameManager.instance != null)
+        {
+            dayText.text = "Day: " + GameManager.instance.CurrentDay;
+        }
     }
 
 
@@ -53,6 +78,9 @@ public class Player : Actor
         healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
         Transform healthBarTransform = healthBarInstance.transform;
         currencyText = GameObject.Find("currencyText").GetComponent<TextMeshProUGUI>();
+        bankedCurrencyText = GameObject.Find("bankedCurrencyText").GetComponent<TextMeshProUGUI>();
+        dayText = GameObject.Find("dayText").GetComponent<TextMeshProUGUI>();
+        dayText.text = "Day: " + GameManager.instance.CurrentDay;
 
         healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
 
@@ -192,7 +220,8 @@ public class Player : Actor
 
     public void UpdateUI()
     {
-        currencyText.text = "Cash: " + CurrencySystem.currency;
+        currencyText.text = "Cash: $" + CurrencySystem.currency;
+        bankedCurrencyText.text = "Bank: $" + CurrencySystem.bankedCurrency;
     }
     
 

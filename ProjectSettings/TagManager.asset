@@ -10,6 +10,7 @@ TagManager:
   - Money
   - Health
   - Pistol
+  - Shotgun
   layers:
   - Default
   - TransparentFX
