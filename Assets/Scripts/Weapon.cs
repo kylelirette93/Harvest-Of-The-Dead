@@ -19,7 +19,7 @@ public class Weapon : MonoBehaviour
     private float reloadSpeedUpgrade = 0;
     private float fireSpeedUpgrade = 0;
     int bulletSpeed = 50;
-    bool canShoot = true;
+    public bool canShoot = true;
     bool isReloading = false;
 
     public GameObject player;

@@ -9,6 +9,7 @@ public class Player : Actor
 {
     public static Player instance;
     public TextMeshProUGUI currencyText;
+    int currency;
     public TextMeshProUGUI bankedCurrencyText;
     public TextMeshProUGUI dayText;
 
@@ -34,10 +35,11 @@ public class Player : Actor
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            
         }      
     }
 
@@ -69,6 +71,12 @@ public class Player : Actor
         }
     }
 
+    void OnDestroy()
+    {
+        Debug.Log("Player instance destroyed.");
+        Debug.Log($"Stack trace: {System.Environment.StackTrace}");
+    }
+
 
     public override void Start()
     {
@@ -80,7 +88,8 @@ public class Player : Actor
         bankedCurrencyText = GameObject.Find("bankedCurrencyText").GetComponent<TextMeshProUGUI>();
         dayText = GameObject.Find("dayText").GetComponent<TextMeshProUGUI>();
         dayText.text = "Day: " + GameManager.instance.CurrentDay;
-        UpdateUI();
+        currency = CurrencySystem.GetCurrency();
+        UpdateUI(currency);
 
         healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
 
@@ -203,7 +212,8 @@ public class Player : Actor
         if (other.gameObject.CompareTag("Money"))
         {
             CurrencySystem.AddCurrency();
-            UpdateUI();
+            currency = CurrencySystem.GetCurrency();
+            UpdateUI(currency);
             Destroy(other.gameObject);
         }
 
@@ -218,16 +228,16 @@ public class Player : Actor
          }
     }
 
-    public void UpdateUI()
+    public void UpdateUI(int currency)
     {
-        currencyText.text = "Cash: $" + CurrencySystem.currency;
+        currencyText.text = "Cash: $" + currency;
         bankedCurrencyText.text = "Bank: $" + CurrencySystem.bankedCurrency;
+        dayText.text = "Day: " + GameManager.instance.CurrentDay;
     }
     
 
     public override void Die()
     {
-        gameObject.SetActive(false);
         healthSystem.Heal(100);
         GameManager.instance.ChangeState(GameManager.GameState.Death);
     }

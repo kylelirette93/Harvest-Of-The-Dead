@@ -39,6 +39,12 @@ public class CurrencySystem : IDataPersistence
         ResetCurrency();
     }
 
+    public static int GetCurrency()
+    {
+        Debug.Log("Getting currency. Current currency: " + currency);
+        return currency;
+    }
+
     public static void ResetCurrency()
     {
         Debug.Log("Resetting currency. Previous currency: " + currency);

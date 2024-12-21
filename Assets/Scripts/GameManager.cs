@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public GameObject studioNamePanel;
     public VideoPlayer studioNameVideoPlayer;
     public GameObject mainMenuPanel;
+    public GameObject fileSelectionPanel;
     public GameObject gunPanel;
     public GameObject graveyardPrefab;
     public GameObject playerPrefab;
@@ -34,12 +35,16 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public AudioClip gamePlayMusic;
     public AudioClip upgradeMusic;
     private AudioSource audioSource;
+    private int currentCurrency;
+
+    List<GameObject> tempDeactivatedHealthBars = new List<GameObject>();
 
     void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -53,6 +58,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         StudioName,
         MainMenu,
+        SelectFile,
         Init,
         Playing,
         NewDay,
@@ -86,7 +92,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 break;
             case GameState.MainMenu:
                 mainMenuPanel.SetActive(false);
-                StopMusic();
+                break;
+            case GameState.SelectFile:
+                fileSelectionPanel.SetActive(false);
                 break;
             case GameState.Init:
                 break;
@@ -99,6 +107,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 break;
             case GameState.Death:
                 deathPanel.SetActive(false);
+                StopMusic();
                 break;
             case GameState.Retreat:
                 retreatPanel.SetActive(false);
@@ -122,10 +131,14 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 break;
             case GameState.MainMenu:
                 mainMenuPanel.SetActive(true);
-                Time.timeScale = 0;
+                Time.timeScale = 1;
                 PlayMusic(menuMusic);
                 break;
+            case GameState.SelectFile:
+                fileSelectionPanel.SetActive(true);
+                break;
             case GameState.Init:
+                StopMusic();
                 gunPanel.SetActive(true);
                 statsPanel.SetActive(true);
                 SpawnPlayer();
@@ -136,7 +149,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 ChangeState(GameState.Playing);
                 break;
             case GameState.Playing:
-                SpawnEnemies();
+                Invoke("SpawnEnemies", 0.1f);
                 Time.timeScale = 1;
                 PlayMusic(gamePlayMusic);
                 break;
@@ -158,29 +171,30 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 break;
             case GameState.Death:
                 statsPanel.SetActive(false);
-                DeactivatePlayer();
                 DeactivateHealthBar();
+                DeactivatePlayer();
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
                 deathPanel.SetActive(true);
                 Time.timeScale = 0;
+                PlayMusic(menuMusic);
                 break;
             case GameState.Retreat:
                 PlayMusic(upgradeMusic);
                 Weapon.instance.StopReload();
-                DeactivatePlayer();
                 DeactivateHealthBar();
+                DeactivatePlayer();
                 DespawnEnemies();
                 DeactivateZombies("Zombie");
                 CurrencySystem.BankCurrency();
                 retreatPanel.SetActive(true);
                 displayCurrencyScript.UpdateUI();
                 statsPanel.SetActive(false);
-                Time.timeScale = 0;
+                Time.timeScale = 1;
                 break;
             case GameState.Upgrade:
                 upgradePanel.SetActive(true);
-                Time.timeScale = 0;
+                Time.timeScale = 1;
                 break;
         }
     }
@@ -207,7 +221,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     }
     void PlayMusic(AudioClip clip)
     {
-        if (audioSource.clip != clip)
+        if (audioSource.clip != clip || !audioSource.isPlaying)
         {
             audioSource.clip = clip;
             audioSource.Play();
@@ -227,12 +241,37 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     void DeactivateHealthBar()
     {
-        playerInstance.GetComponent<Player>().healthBarFill.enabled = false;
+        if (playerInstance != null)
+        {
+            playerInstance.GetComponent<Player>().healthBarFill.enabled = false;
+        }
     }
 
     void ActivateHealthBar()
     {
-        playerInstance.GetComponent<Player>().healthBarFill.enabled = true;
+        if (playerInstance != null)
+        {
+            playerInstance.GetComponent<Player>().healthBarFill.enabled = true;
+        }
+    }
+
+    void DeactivateHealthBars()
+    {
+        tempDeactivatedHealthBars.Clear();
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("HealthBar"))
+        {
+            tempDeactivatedHealthBars.Add(obj);
+            obj.SetActive(false);
+        }
+    }
+
+    void ReactivateHealthBars()     {
+        foreach (GameObject obj in tempDeactivatedHealthBars)
+        {
+
+            obj.SetActive(true);
+        }
+        tempDeactivatedHealthBars.Clear();
     }
 
     void DeactivateZombies(string tag)
@@ -249,6 +288,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
         }
     }
 
+    public void FileSelection()     {
+        ChangeState(GameState.SelectFile);
+    }
 
     public void PlayGame()
     {
@@ -257,12 +299,16 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     public void Pause()
     {
+        Weapon.instance.canShoot = false;
+        DeactivateHealthBars();
         pausePanel.SetActive(true);
         Time.timeScale = 0;
     }
 
     public void Unpause()
     {
+        Weapon.instance.canShoot = true;
+        ReactivateHealthBars();
         pausePanel.SetActive(false);
         Time.timeScale = 1;
     }
@@ -276,22 +322,50 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     public void ActivatePlayer()
     {
-        playerInstance.SetActive(true);
-        playerInstance.GetComponent<Player>().enabled = true;
-        playerInstance.transform.position = originalPosition;
+        if (playerInstance != null)
+        {
+            Debug.Log("Activating player instance");
+            playerInstance.SetActive(true);
+            Player playerScript = playerInstance.GetComponent<Player>();
+            if (playerScript != null)
+            {
+                playerScript.enabled = true;
+                playerInstance.transform.position = originalPosition;
+            }
+            else
+            {
+                Debug.LogError("Player component not found on playerInstance");
+            }
+        }
+        else
+        {
+            Debug.LogError("playerInstance is null, cannot activate player");
+        }
     }
 
     public void DeactivatePlayer()
     {
-        playerInstance.SetActive(false);
-        playerInstance.GetComponent<Player>().enabled = false;
-        playerInstance.SetActive(false);
+        if (playerInstance != null)
+        {
+            Debug.Log("Deactivating player instance");
+            playerInstance.SetActive(false);
+            playerInstance.GetComponent<Player>().enabled = false;
+        }
+        else
+        {
+            Debug.LogWarning("Player instance is already null or destroyed");
+        }
     }
 
     public void StartNewDay()
     {
         WeaponManager.instance.SelectWeaponById(Player.instance.savedWeaponData.weaponId);
         ChangeState(GameState.NewDay);
+    }
+
+    public void BackToMenu()
+    {
+        ChangeState(GameState.MainMenu);
     }
 
     public void ContinueToUpgrades()
@@ -301,14 +375,25 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     void SpawnPlayer()
     {
-        playerInstance = Instantiate(playerPrefab);
-        originalPosition = playerInstance.transform.position;
+        if (playerInstance == null)
+        {
+            playerInstance = Instantiate(playerPrefab);
+            originalPosition = playerInstance.transform.position;
+        }
+        else
+        {
+            Debug.LogWarning("Player instance already exists. Skipping spawn.");
+        }
     }
 
     void UpdateCurrencyText()
     {
-        Player player = playerInstance.GetComponent<Player>();
-        player.UpdateUI();
+        currentCurrency = CurrencySystem.GetCurrency();
+        if (playerInstance != null)
+        {
+            Player player = playerInstance.GetComponent<Player>();
+            player.UpdateUI(currentCurrency);
+        }
     }
     
 

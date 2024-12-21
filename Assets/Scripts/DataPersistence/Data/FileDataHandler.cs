@@ -7,17 +7,23 @@ using System.IO;
 public class FileDataHandler
 {
     private string dataDirPath = "";
+
     private string dataFileName = "";
 
-    public FileDataHandler(string dataDirPath, string dataFileName)
+    private bool useEncryption = false;
+
+    private readonly string encryptionCodeWord = "word";
+
+    public FileDataHandler(string dataDirPath, string dataFileName, bool useEncryption)
     {
         this.dataDirPath = dataDirPath;
         this.dataFileName = dataFileName;
+        this.useEncryption = useEncryption;
     }   
 
-    public GameData Load()
+    public GameData Load(int slotId)
     {
-        string fullPath = Path.Combine(dataDirPath, dataFileName);
+        string fullPath = Path.Combine(dataDirPath, GetFileName(slotId));
         GameData loadedData = null;
         if (File.Exists(fullPath))
         {
@@ -32,6 +38,11 @@ public class FileDataHandler
                     }
                 }
 
+                if (useEncryption)
+                {
+                    dataToLoad = EncryptDecrypt(dataToLoad);
+                }
+
                 loadedData = JsonUtility.FromJson<GameData>(dataToLoad);
             }
             catch (Exception e)
@@ -43,9 +54,9 @@ public class FileDataHandler
         return loadedData;
     }
 
-    public void Save(GameData data)
+    public void Save(GameData data, int slotId)
     {
-        string fullPath = Path.Combine(dataDirPath, dataFileName);
+        string fullPath = Path.Combine(dataDirPath, GetFileName(slotId));
         try
         {
             // Create the directory the file will be written to if it doesnt already exist
@@ -53,6 +64,12 @@ public class FileDataHandler
 
             // Serialize the c# game data object into json
             string dataToStore = JsonUtility.ToJson(data, true);
+
+            // Encrypt the data if encryption is enabled
+            if (useEncryption)
+            {
+                dataToStore = EncryptDecrypt(dataToStore);
+            }
 
             // Write the serialized data to the file
             using (FileStream stream = new FileStream(fullPath, FileMode.Create))
@@ -69,5 +86,20 @@ public class FileDataHandler
         }
     }
 
+
+    private string EncryptDecrypt(string data)
+    {
+        string modifiedData = "";
+        for (int i = 0; i < data.Length; i++)
+        {
+            modifiedData += (char)(data[i] ^ encryptionCodeWord[(i % encryptionCodeWord.Length)]);  
+        }
+        return modifiedData;
+    }
+
+    private string GetFileName(int slotId)
+    {
+        return $"{dataFileName}_{slotId}.json";
+    }
 
 }

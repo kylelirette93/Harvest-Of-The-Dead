@@ -42,7 +42,14 @@ public class Zombie : Actor
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         bloodParticles = GetComponent<ParticleSystem>();
-        playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+
+        Debug.Log("Starting InitializePlayerTransform coroutine");
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+        {
+            playerTransform = playerObject.GetComponent<Transform>();
+            Debug.Log("Player transform initialized: " + playerTransform.position);
+        }
 
         if (healthBarInstance == null)
         {
@@ -68,11 +75,16 @@ public class Zombie : Actor
         UpdateZombieState();
     }
 
-   
+    
 
     public override void Update()
     {
         base.Update();
+
+        if (playerTransform == null)
+        {
+            return;
+        }
 
         Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up);
         healthBarFill.transform.position = screenPosition;
