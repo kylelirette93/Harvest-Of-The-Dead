@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class WeaponManager : MonoBehaviour
+public class WeaponManager : MonoBehaviour, IDataPersistence
 {
     public static WeaponManager instance;
 
@@ -14,7 +15,11 @@ public class WeaponManager : MonoBehaviour
     private HashSet<string> purchasedWeapons = new HashSet<string>();
     private WeaponData lastSelectedWeaponData;
     public string selectedWeaponId;
+    public GameData gameData;
 
+    public Sprite pistolIcon;
+    public Sprite shotgunIcon;
+    public Sprite shotgunLockedIcon;
     private void Awake()
     {
         if (instance == null)
@@ -22,16 +27,54 @@ public class WeaponManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
 
-            InitializeWeaponsDictionary();
+            // Initialize the Pistol weapon here
+            WeaponData pistol = new WeaponData
+            {
+                weaponId = "Pistol",
+                weaponName = "Pistol",
+                damage = 10,
+                reloadSpeed = 2,
+                fireSpeed = 0.4f,
+                unlockDay = 1,
+                damageUpgradePrice = 300,
+                reloadSpeedUpgradePrice = 200,
+                fireSpeedUpgradePrice = 250,
+                unlockPrice = 0,
+                maxDamage = 20,
+                minReloadSpeed = 1,
+                minFireSpeed = 0.15f
+            };
 
-            string pistolWeaponId = "Pistol";
-            purchasedWeapons.Add(pistolWeaponId);
-            UnlockWeapon(pistolWeaponId);
+            if (weaponsList == null)
+            {
+                weaponsList.Add(pistol);
+                weaponsDictionary.Add(pistol.weaponId, pistol);
+
+                InitializeWeaponsDictionary();
+
+                if (purchasedWeapons == null)
+                {
+                    string pistolWeaponId = "Pistol";
+                    purchasedWeapons.Add(pistolWeaponId);
+                    UnlockWeapon(pistolWeaponId);
+                }
+            }
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    public void LoadData(GameData data)
+    {
+        this.weaponsList = data.storedWeaponsData;
+        this.unlockedWeapons = data.storedWeaponsData.FindAll(w => w.unlockDay <= data.currentDay);
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        data.storedWeaponsData = this.weaponsList;
     }
 
     public void SaveCurrentWeaponData(WeaponData weaponData)
@@ -50,7 +93,7 @@ public class WeaponManager : MonoBehaviour
         {
             if (!weaponsDictionary.ContainsKey(weapon.weaponId))
             {
-                weaponsDictionary.Add(weapon.weaponId, weapon);
+                weaponsDictionary.Add(weapon.weaponId, weapon);  // Add each weapon, not just the selected one.
             }
         }
     }
@@ -133,6 +176,7 @@ public class WeaponManager : MonoBehaviour
     public void AddWeapon(GameObject weapon)
     {
         weaponInventory.AddWeapon(weapon);
+        
     }
 
     public void RemoveWeapon(GameObject weapon)
@@ -215,10 +259,12 @@ public class WeaponManager : MonoBehaviour
     {
         return selectedWeapon;
     }
+
+
 }
 
 [System.Serializable]
-public class WeaponData
+public class WeaponData : IDataPersistence
 {
     public string weaponId;
     public string weaponName;
@@ -226,8 +272,6 @@ public class WeaponData
     public float reloadSpeed;
     public float fireSpeed;
     public int unlockDay;
-    public Sprite weaponIcon;
-    public Sprite lockedIcon;
     public float damageUpgradePrice;
     public float reloadSpeedUpgradePrice;
     public float fireSpeedUpgradePrice;
@@ -236,4 +280,55 @@ public class WeaponData
     public float maxDamage;
     public float minReloadSpeed;
     public float minFireSpeed;
+
+
+    public void LoadData(GameData data)
+    {
+        // Find the weapon data in the list by weaponId
+        var weaponData = data.storedWeaponsData.Find(w => w.weaponId == this.weaponId);
+        if (weaponData != null)
+        {
+            this.weaponId = weaponData.weaponId;
+            this.weaponName = weaponData.weaponName;
+            this.damage = weaponData.damage;
+            this.reloadSpeed = weaponData.reloadSpeed;
+            this.fireSpeed = weaponData.fireSpeed;
+            this.unlockDay = weaponData.unlockDay;
+            this.damageUpgradePrice = weaponData.damageUpgradePrice;
+            this.reloadSpeedUpgradePrice = weaponData.reloadSpeedUpgradePrice;
+            this.fireSpeedUpgradePrice = weaponData.fireSpeedUpgradePrice;
+            this.unlockPrice = weaponData.unlockPrice;
+            this.maxDamage = weaponData.maxDamage;
+            this.minReloadSpeed = weaponData.minReloadSpeed;
+            this.minFireSpeed = weaponData.minFireSpeed;
+        }
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        // Find the weapon data in the list by weaponId
+        var weaponData = data.storedWeaponsData.Find(w => w.weaponId == this.weaponId);
+        if (weaponData != null)
+        {
+            weaponData.weaponId = this.weaponId;
+            weaponData.weaponName = this.weaponName;
+            weaponData.damage = this.damage;
+            weaponData.reloadSpeed = this.reloadSpeed;
+            weaponData.fireSpeed = this.fireSpeed;
+            weaponData.unlockDay = this.unlockDay;
+            weaponData.damageUpgradePrice = this.damageUpgradePrice;
+            weaponData.reloadSpeedUpgradePrice = this.reloadSpeedUpgradePrice;
+            weaponData.fireSpeedUpgradePrice = this.fireSpeedUpgradePrice;
+            weaponData.unlockPrice = this.unlockPrice;
+            weaponData.maxDamage = this.maxDamage;
+            weaponData.minReloadSpeed = this.minReloadSpeed;
+            weaponData.minFireSpeed = this.minFireSpeed;
+        }
+        else
+        {
+            // If the weapon data does not exist, add it to the list
+            data.storedWeaponsData.Add(this);
+        }
+    }
+
 }

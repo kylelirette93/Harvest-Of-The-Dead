@@ -178,7 +178,7 @@ public class Weapon : MonoBehaviour
         this.damage = weaponData.damage;
         this.reloadSpeed = weaponData.reloadSpeed;
         this.fireSpeed = weaponData.fireSpeed;
-        Debug.Log($"Weapon data set to: {weaponData.weaponName}");
+        Debug.Log($"Weapon data set to: {weaponData.weaponName}, fireSpeed: {fireSpeed}");
     }
 
     public void SwitchWeapon(int weaponIndex)
@@ -189,6 +189,9 @@ public class Weapon : MonoBehaviour
         {
             InstantiateWeapon(weaponIndex);
             weaponType = (WeaponType)weaponIndex; // Set the new weapon type
+
+            // Log the fireSpeed value after switching weapons
+            Debug.Log($"Switched to weapon: {weaponType}, fireSpeed: {fireSpeed}");
         }
         else
         {
@@ -221,6 +224,7 @@ public class Weapon : MonoBehaviour
                 StartCoroutine(DeactivateMuzzleFlash());
 
                 weaponAmmo[weaponType]--; // Decrease ammo for the current weapon
+                Debug.Log("Starting FireDelay coroutine");
                 StartCoroutine(FireDelay());
 
                 if (weaponAmmo[weaponType] <= 0)
@@ -277,8 +281,10 @@ public class Weapon : MonoBehaviour
     private IEnumerator FireDelay()
     {
         canShoot = false;
+        Debug.Log("FireDelay started, waiting for " + fireSpeed + " seconds");
         yield return new WaitForSeconds(fireSpeed);
         canShoot = true;
+        Debug.Log("FireDelay ended, canShoot set to true");
     }
 
     private IEnumerator DeactivateMuzzleFlash()
@@ -401,14 +407,7 @@ public class Weapon : MonoBehaviour
             fireSpeed = weaponData.fireSpeed - fireSpeedUpgrade;
         }
     }
-    public virtual void Update()
-    {
-        // Allow shooting if the weapon is ready and ammo is available
-        if (!isReloading && weaponAmmo[weaponType] > 0)
-        {
-            canShoot = true;
-        }
-    }
+    
 
     public void PurchaseShotgun()
     {

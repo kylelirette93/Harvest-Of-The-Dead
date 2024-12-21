@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.Video;
 using UnityEngine.XR;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IDataPersistence
 {
     public static GameManager instance;
 
@@ -65,7 +65,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        CurrentDay = 1;
         ChangeState(GameState.StudioName);
     }
 
@@ -184,6 +183,16 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0;
                 break;
         }
+    }
+
+    public void LoadData(GameData data)
+    {
+        this.CurrentDay = data.currentDay;
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        data.currentDay = CurrentDay;
     }
 
     void TransitionToMainMenu()

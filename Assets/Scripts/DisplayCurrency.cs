@@ -9,6 +9,11 @@ public class DisplayCurrency : MonoBehaviour
     int currentCurrency;
     int bankedCurrency;
 
+    private void Start()
+    {
+        UpdateUI();
+    }
+
     public void UpdateUI()
     {
         currentCurrency = CurrencySystem.earnedCurrency;

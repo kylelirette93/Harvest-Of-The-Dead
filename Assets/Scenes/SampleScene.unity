@@ -8992,6 +8992,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 619797754}
   m_CullTransparentMesh: 1
+--- !u!1 &660725286
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 660725288}
+  - component: {fileID: 660725287}
+  m_Layer: 0
+  m_Name: DataPersistenceManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &660725287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 660725286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8422155e0792cf40aae9d73842bed95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fileName: data.json
+--- !u!4 &660725288
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 660725286}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -21.335567, y: 187.48253, z: 1.9855856}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &702350257
 GameObject:
   m_ObjectHideFlags: 0
@@ -11371,8 +11416,6 @@ MonoBehaviour:
     reloadSpeed: 2
     fireSpeed: 0.4
     unlockDay: 1
-    weaponIcon: {fileID: 1741992636, guid: 599b0962b323aff46bd4ea272275cc31, type: 3}
-    lockedIcon: {fileID: 1741992636, guid: 599b0962b323aff46bd4ea272275cc31, type: 3}
     damageUpgradePrice: 300
     reloadSpeedUpgradePrice: 200
     fireSpeedUpgradePrice: 250
@@ -11384,19 +11427,52 @@ MonoBehaviour:
     weaponName: Shotgun
     damage: 20
     reloadSpeed: 3
-    fireSpeed: 0.8
+    fireSpeed: 1.5
     unlockDay: 10
-    weaponIcon: {fileID: -522987613, guid: e1f35ac8922feb74fb0c5bda003bb471, type: 3}
-    lockedIcon: {fileID: -621565417, guid: 700624db0dd3c214480d0a0f9a14f14a, type: 3}
     damageUpgradePrice: 500
     reloadSpeedUpgradePrice: 400
     fireSpeedUpgradePrice: 450
     unlockPrice: 2000
     maxDamage: 30
     minReloadSpeed: 2
-    minFireSpeed: 0.55
+    minFireSpeed: 1.25
   unlockedWeapons: []
   selectedWeaponId: 
+  gameData:
+    currentDay: 1
+    earnedCurrency: 0
+    bankedCurrency: 0
+    currency: 0
+    storedWeaponsData:
+    - weaponId: Pistol
+      weaponName: Pistol
+      damage: 10
+      reloadSpeed: 2
+      fireSpeed: 0.4
+      unlockDay: 1
+      damageUpgradePrice: 300
+      reloadSpeedUpgradePrice: 200
+      fireSpeedUpgradePrice: 250
+      unlockPrice: 0
+      maxDamage: 20
+      minReloadSpeed: 1
+      minFireSpeed: 0.15
+    - weaponId: Shotgun
+      weaponName: Shotgun
+      damage: 20
+      reloadSpeed: 3
+      fireSpeed: 1.5
+      unlockDay: 10
+      damageUpgradePrice: 500
+      reloadSpeedUpgradePrice: 400
+      fireSpeedUpgradePrice: 450
+      unlockPrice: 2000
+      maxDamage: 30
+      minReloadSpeed: 2
+      minFireSpeed: 1.25
+  pistolIcon: {fileID: 1741992636, guid: 599b0962b323aff46bd4ea272275cc31, type: 3}
+  shotgunIcon: {fileID: -522987613, guid: e1f35ac8922feb74fb0c5bda003bb471, type: 3}
+  shotgunLockedIcon: {fileID: -621565417, guid: 700624db0dd3c214480d0a0f9a14f14a, type: 3}
 --- !u!1 &859192628
 GameObject:
   m_ObjectHideFlags: 0
@@ -15391,7 +15467,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1802030963
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17260,3 +17336,4 @@ SceneRoots:
   - {fileID: 1753886180876062285}
   - {fileID: 857334599}
   - {fileID: 497328654}
+  - {fileID: 660725288}

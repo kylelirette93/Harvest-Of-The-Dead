@@ -8,7 +8,6 @@ using TMPro;
 public class Player : Actor
 {
     public static Player instance;
-    CurrencySystem currencySystem = new CurrencySystem();
     public TextMeshProUGUI currencyText;
     public TextMeshProUGUI bankedCurrencyText;
     public TextMeshProUGUI dayText;
@@ -81,6 +80,7 @@ public class Player : Actor
         bankedCurrencyText = GameObject.Find("bankedCurrencyText").GetComponent<TextMeshProUGUI>();
         dayText = GameObject.Find("dayText").GetComponent<TextMeshProUGUI>();
         dayText.text = "Day: " + GameManager.instance.CurrentDay;
+        UpdateUI();
 
         healthBarFill = healthBarInstance.transform.Find("Fill").GetComponent<Image>();
 
@@ -202,7 +202,7 @@ public class Player : Actor
 
         if (other.gameObject.CompareTag("Money"))
         {
-            currencySystem.AddCurrency();
+            CurrencySystem.AddCurrency();
             UpdateUI();
             Destroy(other.gameObject);
         }

@@ -3,22 +3,28 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class CurrencySystem
+public class CurrencySystem : IDataPersistence
 {
-    public static int currency = 0;
-    public static int bankedCurrency = 0;
-    public static int earnedCurrency = 0;
+    public static int currency;
+    public static int bankedCurrency;
+    public static int earnedCurrency;
 
-    [RuntimeInitializeOnLoadMethod]
-    private static void ResetStatics()
+   
+    public void LoadData(GameData data)
     {
-        currency = 3000;
-        bankedCurrency = 0;
-        earnedCurrency = 0;
-        Debug.Log("CurrencySystem static fields reset.");
+        currency = data.currency;
+        bankedCurrency = data.bankedCurrency;
+        earnedCurrency = data.earnedCurrency;
     }
 
-    public void AddCurrency()
+    public void SaveData(ref GameData data)
+    {
+        data.currency = currency;
+        data.earnedCurrency = earnedCurrency;
+        data.bankedCurrency = bankedCurrency;
+    }
+
+    public static void AddCurrency()
     {
         int earned = Random.Range(10, 100);
         currency += earned;

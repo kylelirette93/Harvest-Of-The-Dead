@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 using Unity.VisualScripting;
+using System.Linq;
 
 public class UpgradeManager : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class UpgradeManager : MonoBehaviour
     public TextMeshProUGUI upgradeDamageText;
     public TextMeshProUGUI upgradeReloadSpeedText;
     public TextMeshProUGUI upgradeFireSpeedText;
-    public TextMeshProUGUI selectedWeaponText;
+    public TextMeshProUGUI selectedWeaponText; 
 
     // UI references for weapon icons.
     public Image pistolIcon;
@@ -190,17 +191,38 @@ public class UpgradeManager : MonoBehaviour
 
             if (isPurchased)
             {
-                iconImage.sprite = weaponData.weaponIcon;
+                if (weaponId == "Pistol")
+                {
+                    iconImage.sprite = WeaponManager.instance.pistolIcon;
+                }
+                else if (weaponId == "Shotgun")
+                {
+                    iconImage.sprite = WeaponManager.instance.shotgunIcon;
+                }
                 selectedWeaponText.text = $"{weaponData.weaponName} is purchased!";
             }
             else if (isUnlocked)
             {
-                iconImage.sprite = weaponData.weaponIcon;
+                if (weaponId == "Pistol")
+                {
+                    iconImage.sprite = WeaponManager.instance.pistolIcon;
+                }
+                else if (weaponId == "Shotgun")
+                {
+                    iconImage.sprite = WeaponManager.instance.shotgunIcon;
+                }
                 selectedWeaponText.text = canPurchase ? $"{weaponData.weaponName} is available for purchase!" : "Insufficient funds!";
             }
             else
             {
-                iconImage.sprite = weaponData.lockedIcon;
+                if (weaponId == "Shotgun")
+                {
+                    iconImage.sprite = WeaponManager.instance.shotgunLockedIcon;
+                }
+                else if (weaponId == "Pistol")
+                {
+                    iconImage.sprite = WeaponManager.instance.pistolIcon;
+                }
                 selectedWeaponText.text = $"{weaponData.weaponName.ToLower()} will unlock on day {weaponData.unlockDay}";
             }
 
@@ -544,6 +566,8 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log("Upgrade damage button clicked.");
         AttemptUpgrade("Damage", upgradeCost, 2f);
         EventSystem.current.SetSelectedGameObject(null);
+        GameData gameData = new GameData();
+        gameData.storedWeaponsData.Add(weaponData);
     }
 
     public void OnUpgradeReloadSpeedButtonClicked()
@@ -552,6 +576,8 @@ public class UpgradeManager : MonoBehaviour
         int upgradeCost = (int)weaponData.reloadSpeedUpgradePrice;
         AttemptUpgrade("ReloadSpeed", upgradeCost, 0.2f);
         EventSystem.current.SetSelectedGameObject(null);
+        GameData gameData = new GameData();
+        gameData.storedWeaponsData.Add(weaponData);
     }
 
     public void OnUpgradeFireSpeedButtonClicked()
@@ -560,5 +586,7 @@ public class UpgradeManager : MonoBehaviour
         int upgradeCost = (int)weaponData.fireSpeedUpgradePrice;
         AttemptUpgrade("FireSpeed", upgradeCost, 0.05f);
         EventSystem.current.SetSelectedGameObject(null);
+        GameData gameData = new GameData();
+        gameData.storedWeaponsData.Add(weaponData);
     }
 }
