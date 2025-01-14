@@ -18,7 +18,7 @@ public class DropItem : MonoBehaviour
         // Initialize the enemyDrops list after items have been assigned
         enemyDrops = new List<EnemyDrop>
         {
-            new EnemyDrop { Name = "Money", item = items[0], weight = 0.5f },
+            new EnemyDrop { Name = "Money", item = items[0], weight = 0.7f },
             new EnemyDrop { Name = "Health", item = items[1], weight = 0.3f }
         };
     }

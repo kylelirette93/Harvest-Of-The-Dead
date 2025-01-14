@@ -80,7 +80,7 @@ public class UpgradeManager : MonoBehaviour
 
         if (shotgunButton != null)
         {
-            shotgunButton.onClick.AddListener(() => UnlockShotgun(2));
+            shotgunButton.onClick.AddListener(() => UnlockShotgun(10));
         }
 
 
@@ -126,7 +126,7 @@ public class UpgradeManager : MonoBehaviour
                 {
                     CurrencySystem.bankedCurrency -= unlockPrice;
                     WeaponManager.instance.UnlockWeapon(weaponId);
-                    Debug.Log($"Weapon {weaponId} unlocked!");
+                    //Debug.Log($"Weapon {weaponId} unlocked!");
                     availableCurrencyText.text = $"new weapon available: {weaponId}";
                 }
                 else
@@ -184,7 +184,7 @@ public class UpgradeManager : MonoBehaviour
             bool isPurchased = WeaponManager.instance.unlockedWeapons.Contains(weaponData);
             bool canPurchase = CurrencySystem.bankedCurrency >= weaponData.unlockPrice;
 
-            Debug.Log($"Weapon: {weaponId}, CurrentDay: {GameManager.instance.CurrentDay}, UnlockDay: {weaponData.unlockDay}, IsUnlocked: {isUnlocked}, IsPurchased: {isPurchased}, CanPurchase: {canPurchase}");
+            //Debug.Log($"Weapon: {weaponId}, CurrentDay: {GameManager.instance.CurrentDay}, UnlockDay: {weaponData.unlockDay}, IsUnlocked: {isUnlocked}, IsPurchased: {isPurchased}, CanPurchase: {canPurchase}");
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() => HandleWeaponButtonClick(weaponData, isUnlocked, isPurchased, canPurchase));
@@ -283,6 +283,7 @@ public class UpgradeManager : MonoBehaviour
         {
             case UpgradeState.SelectWeapon:
                 weaponSelectionPanel.SetActive(true);
+                upgradeButtonPanel.SetActive(false);
                 Time.timeScale = 0;
                 break;
             case UpgradeState.UpgradeWeapon:
@@ -297,7 +298,7 @@ public class UpgradeManager : MonoBehaviour
 
         if (WeaponManager.instance == null)
         {
-            Debug.LogError("WeaponManager instance is null.");
+           // Debug.LogError("WeaponManager instance is null.");
             return;
         }
 
@@ -306,13 +307,13 @@ public class UpgradeManager : MonoBehaviour
         WeaponData selectedWeapon = WeaponManager.instance.GetSelectedWeaponData();
         if (selectedWeapon == null)
         {
-            Debug.LogError("Selected weapon data is null.");
+            //Debug.LogError("Selected weapon data is null.");
             availableCurrencyText.text = "available funds: " + CurrencySystem.bankedCurrency;
             return;
         }
 
-        Debug.Log($"Selected weapon: {selectedWeapon.weaponName}");
-        Debug.Log($"Is weapon unlocked: {WeaponManager.instance.unlockedWeapons.Contains(selectedWeapon)}");
+        //Debug.Log($"Selected weapon: {selectedWeapon.weaponName}");
+        //Debug.Log($"Is weapon unlocked: {WeaponManager.instance.unlockedWeapons.Contains(selectedWeapon)}");
 
         if (WeaponManager.instance.unlockedWeapons.Contains(selectedWeapon))
         {
@@ -360,42 +361,39 @@ public class UpgradeManager : MonoBehaviour
         UpdateAvailableCurrencyText();
     }
 
-    
+
 
     public void UnlockShotgun(int unlockDay)
     {
-        Debug.Log("UnlockShotgun method called."); // Add this line for debugging
+        //Debug.Log("UnlockShotgun method called."); // Add this line for debugging
         WeaponData weaponData = WeaponManager.instance.weaponsList.Find(w => w.weaponId == "Shotgun");
         if (weaponData != null)
         {
-            Debug.Log($"Current Day: {GameManager.instance.CurrentDay}, Unlock Day: {unlockDay}");
-            Debug.Log($"Banked Currency: {CurrencySystem.bankedCurrency}, Unlock Price: {weaponData.unlockPrice}");
+            //Debug.Log($"Current Day: {GameManager.instance.CurrentDay}, Unlock Day: {unlockDay}");
+           // Debug.Log($"Banked Currency: {CurrencySystem.bankedCurrency}, Unlock Price: {weaponData.unlockPrice}");
 
-            if (GameManager.instance.CurrentDay >= unlockDay && !WeaponManager.instance.unlockedWeapons.Contains(weaponData))
+            bool isDayValid = GameManager.instance.CurrentDay >= unlockDay;
+            bool isWeaponUnlocked = WeaponManager.instance.unlockedWeapons.Contains(weaponData);
+            bool hasEnoughCurrency = CurrencySystem.bankedCurrency >= weaponData.unlockPrice;
+
+            if (isDayValid && !isWeaponUnlocked && hasEnoughCurrency)
             {
-                if (CurrencySystem.bankedCurrency >= weaponData.unlockPrice)
-                {
-                    // Deduct the funds
-                    CurrencySystem.bankedCurrency -= weaponData.unlockPrice;
+                // Deduct the funds
+                CurrencySystem.bankedCurrency -= weaponData.unlockPrice;
 
-                    // Unlock the shotgun
-                    WeaponManager.instance.unlockedWeapons.Add(weaponData);
-                    UpdateWeaponIcons();
+                // Unlock the shotgun
+                WeaponManager.instance.unlockedWeapons.Add(weaponData);
+                UpdateWeaponIcons();
 
-                    // Provide feedback to the user
-                    DisplayTemporaryMessage("shotgun unlocked!", 2f);
+                // Provide feedback to the user
+                DisplayTemporaryMessage("shotgun unlocked!", 2f);
 
-                    WeaponManager.instance.SelectWeaponById("Shotgun");
-                    SetShotgunUpgradeListener();
-                    StartCoroutine(UpdateSelectedWeaponTextWithDelay(2f, weaponData.weaponName));
-                    ChangeState(UpgradeState.UpgradeWeapon);
-                }
-                else
-                {
-                    DisplayTemporaryMessage("insufficient funds!", 2f);
-                }
+                WeaponManager.instance.SelectWeaponById("Shotgun");
+                SetShotgunUpgradeListener();
+                StartCoroutine(UpdateSelectedWeaponTextWithDelay(2f, weaponData.weaponName));
+                ChangeState(UpgradeState.UpgradeWeapon);
             }
-            else if (WeaponManager.instance.unlockedWeapons.Contains(weaponData))
+            else if (isWeaponUnlocked)
             {
                 // Select the shotgun if it is already unlocked
                 WeaponManager.instance.SelectWeaponById("Shotgun");
@@ -407,12 +405,19 @@ public class UpgradeManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Conditions not met for unlocking the shotgun.");
+                if (!isDayValid)
+                {
+                    //Debug.Log("Conditions not met for unlocking the shotgun: Incorrect day.");
+                }
+                else if (!hasEnoughCurrency)
+                {
+                    DisplayTemporaryMessage("insufficient funds!", 2f);
+                }
             }
         }
         else
         {
-            Debug.LogError("Shotgun data not found in weapons list.");
+            //Debug.LogError("Shotgun data not found in weapons list.");
         }
     }
 
@@ -480,10 +485,10 @@ public class UpgradeManager : MonoBehaviour
 
     public void AttemptUpgrade(string upgradeType, int upgradeCost, float valueChange)
     {
-        Debug.Log("Attempting upgrade");
+        //Debug.Log("Attempting upgrade");
         if (!canBuyUpgrade)
         {
-            Debug.Log("Cannot buy upgrade at this time.");
+            //Debug.Log("Cannot buy upgrade at this time.");
             return;
         }
 
@@ -494,7 +499,7 @@ public class UpgradeManager : MonoBehaviour
 
             if (WeaponManager.instance == null)
             {
-                Debug.LogError("WeaponManager instance is null.");
+                //Debug.LogError("WeaponManager instance is null.");
                 return;
             }
 
@@ -507,7 +512,7 @@ public class UpgradeManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Weapon instance is null.");
+                //Debug.LogError("Weapon instance is null.");
             }
         }
         else

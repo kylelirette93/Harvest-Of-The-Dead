@@ -28,7 +28,7 @@ public class ObjectPool : MonoBehaviour
         }
         else
         {
-            Debug.Log("Enemy's aren't ready to spawn yet.");
+            //Debug.Log("Enemy's aren't ready to spawn yet.");
         }
     }
 

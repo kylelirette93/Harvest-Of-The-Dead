@@ -104,6 +104,7 @@ MonoBehaviour:
   bankedCurrencyText: {fileID: 0}
   dayText: {fileID: 0}
   healthBarFill: {fileID: 0}
+  crosshairPrefab: {fileID: 4132638602642075582, guid: ed5154c47f2cb924a91d5022a5323274, type: 3}
   moveSpeed: 7
   savedWeaponData:
     weaponId: 

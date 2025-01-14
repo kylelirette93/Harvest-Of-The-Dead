@@ -43,7 +43,7 @@ public class Zombie : Actor
         animator = GetComponent<Animator>();
         bloodParticles = GetComponent<ParticleSystem>();
 
-        Debug.Log("Starting InitializePlayerTransform coroutine");
+       // Debug.Log("Starting InitializePlayerTransform coroutine");
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
@@ -53,7 +53,7 @@ public class Zombie : Actor
 
         if (healthBarInstance == null)
         {
-            Debug.Log("Creating health bar");
+            //Debug.Log("Creating health bar");
             healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
             Transform healthBarTransform = healthBarInstance.transform;
 
@@ -68,14 +68,16 @@ public class Zombie : Actor
         }
         else
         {
-            Debug.Log("Reactivating health bar");
+            //Debug.Log("Reactivating health bar");
             healthBarInstance.SetActive(true);
         }
+        currentState = ZombieState.Healthy;
+        UpdateZombieAnimation();
 
         UpdateZombieState();
     }
 
-    
+
 
     public override void Update()
     {
@@ -133,6 +135,7 @@ public class Zombie : Actor
             Vector3 newPosition = transform.position + finalDirection * chaseSpeed * Time.smoothDeltaTime;
             newPosition.x = Mathf.Clamp(newPosition.x, mapMinX, mapMaxX);
             newPosition.y = Mathf.Clamp(newPosition.y, mapMinY, mapMaxY);
+            newPosition.z = 0; // Ensure z position is always 0
             transform.position = newPosition;
         }
 
@@ -201,6 +204,7 @@ public class Zombie : Actor
 
     public void DeactivateZombie()
     {
+        //Debug.Log("Deactivating zombie: " + gameObject.name);
         healthBarFill.transform.parent.gameObject.SetActive(false);
         this.gameObject.SetActive(false);
     }

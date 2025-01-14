@@ -17,6 +17,8 @@ public class Player : Actor
     Rigidbody2D rb;
     public Image healthBarFill;
     public static GameObject healthBarInstance;
+    public GameObject crosshairPrefab; // Reference to the crosshair prefab
+    private GameObject crosshairInstance; // Instance of the crosshair
 
     // Variables.
     public float moveSpeed = 5f;
@@ -30,6 +32,12 @@ public class Player : Actor
     int mapMinY = -7;
     int mapMaxY = 7;
 
+    // New variables for crosshair scaling
+    Vector3 normalScale = Vector3.one;
+    Vector3 enlargedScale = new Vector3(1.5f, 1.5f, 1.5f);
+    float scaleSpeed = 10f;
+    bool isShooting = false;
+
     private void Awake()
     {
         if (instance == null)
@@ -39,8 +47,8 @@ public class Player : Actor
         }
         else
         {
-            
-        }      
+            Destroy(gameObject);
+        }
     }
 
     public WeaponData savedWeaponData;
@@ -52,10 +60,17 @@ public class Player : Actor
         {
             savedWeaponData = Weapon.instance.GetCurrentWeaponData();
         }
+
+        // Destroy the crosshair instance when the player is disabled
+        if (crosshairInstance != null)
+        {
+            Destroy(crosshairInstance);
+        }
     }
 
     private void OnEnable()
     {
+        rb = GetComponent<Rigidbody2D>();
         if (healthSystem != null)
         {
             healthSystem.Heal(100);
@@ -69,14 +84,21 @@ public class Player : Actor
         {
             dayText.text = "Day: " + GameManager.instance.CurrentDay;
         }
+
+        // Instantiate the crosshair prefab and make it a child of the canvas
+        Canvas healthCanvas = FindObjectOfType<Canvas>();
+        if (crosshairPrefab != null && healthCanvas != null)
+        {
+            crosshairInstance = Instantiate(crosshairPrefab, healthCanvas.transform);
+            crosshairInstance.transform.localScale = normalScale;
+        }
     }
 
     void OnDestroy()
     {
-        Debug.Log("Player instance destroyed.");
-        Debug.Log($"Stack trace: {System.Environment.StackTrace}");
+        //Debug.Log("Player instance destroyed.");
+        //Debug.Log($"Stack trace: {System.Environment.StackTrace}");
     }
-
 
     public override void Start()
     {
@@ -98,15 +120,11 @@ public class Player : Actor
         {
             healthBarTransform.SetParent(healthCanvas.transform, false);
         }
-        healthBarTransform.localScale = Vector3.one;
+        healthBarTransform.localScale = normalScale;
 
-        rb = GetComponent<Rigidbody2D>();
         fireCooldown = Weapon.instance.fireSpeed;
         currentHealth = healthSystem.currentHealth;
-
-
     }
-
 
     public override void Update()
     {
@@ -139,10 +157,25 @@ public class Player : Actor
         float verticalMovement = Input.GetAxisRaw("Vertical");
 
         // Fire weapon on mouse click.
-        if (Input.GetMouseButtonDown(0) && timeSinceLastShot >= fireCooldown)
+        if (Input.GetMouseButton(0) && timeSinceLastShot >= fireCooldown)
         {
             Weapon.instance.Shoot();
             timeSinceLastShot = 0f;
+            isShooting = true;
+        }
+
+        // Gradually scale the crosshair
+        if (isShooting)
+        {
+            crosshairInstance.transform.localScale = Vector3.Lerp(crosshairInstance.transform.localScale, enlargedScale, Time.deltaTime * scaleSpeed);
+            if (Vector3.Distance(crosshairInstance.transform.localScale, enlargedScale) < 0.01f)
+            {
+                isShooting = false;
+            }
+        }
+        else
+        {
+            crosshairInstance.transform.localScale = Vector3.Lerp(crosshairInstance.transform.localScale, normalScale, Time.deltaTime * scaleSpeed);
         }
 
         // Direction is based on input.
@@ -159,6 +192,12 @@ public class Player : Actor
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             GameManager.instance.Pause();
+        }
+
+        // Update crosshair position
+        if (crosshairInstance != null)
+        {
+            crosshairInstance.transform.position = Input.mousePosition;
         }
     }
 
@@ -185,7 +224,7 @@ public class Player : Actor
         }
     }
 
-    public void SpawnHealthBar() 
+    public void SpawnHealthBar()
     {
         healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
         Transform healthBarTransform = healthBarInstance.transform;
@@ -198,8 +237,7 @@ public class Player : Actor
         {
             healthBarTransform.SetParent(healthCanvas.transform, false);
         }
-        healthBarTransform.localScale = Vector3.one;
-
+        healthBarTransform.localScale = normalScale;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -223,9 +261,9 @@ public class Player : Actor
             Destroy(other.gameObject);
         }
         if (other.gameObject.CompareTag("Home"))
-         {
+        {
             GameManager.instance.ChangeState(GameManager.GameState.Retreat);
-         }
+        }
     }
 
     public void UpdateUI(int currency)
@@ -234,11 +272,27 @@ public class Player : Actor
         bankedCurrencyText.text = "Bank: $" + CurrencySystem.bankedCurrency;
         dayText.text = "Day: " + GameManager.instance.CurrentDay;
     }
-    
+
 
     public override void Die()
     {
         healthSystem.Heal(100);
         GameManager.instance.ChangeState(GameManager.GameState.Death);
+    }
+
+    public void DisableCrosshair()
+    {
+        if (crosshairInstance != null)
+        {
+            crosshairInstance.SetActive(false);
+        }
+    }
+
+    public void EnableCrosshair()
+    {
+        if (crosshairInstance != null)
+        {
+            crosshairInstance.SetActive(true);
+        }
     }
 }

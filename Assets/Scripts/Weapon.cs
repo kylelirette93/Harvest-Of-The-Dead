@@ -54,6 +54,7 @@ public class Weapon : MonoBehaviour
     public WeaponType weaponType;
 
     AudioSource shootSound;
+    AudioSource reloadSound;
 
     private void Awake()
     {
@@ -131,7 +132,8 @@ public class Weapon : MonoBehaviour
                 weaponType = WeaponType.Shotgun;
             }
 
-            shootSound = currentWeapon.GetComponent<AudioSource>();
+            shootSound = currentWeapon.transform.Find("ShootSound").GetComponent<AudioSource>();
+            reloadSound = currentWeapon.transform.Find("ReloadSound").GetComponent<AudioSource>();
 
             // Assign current weapon's muzzle flash point to the muzzle flash point variable.
             muzzleFlashPoint = currentWeapon.transform.Find(muzzleFlashTag);
@@ -150,7 +152,7 @@ public class Weapon : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Weapon data not found for: " + weaponsList[index].name);
+                //Debug.LogWarning("Weapon data not found for: " + weaponsList[index].name);
             }
         }
     }
@@ -162,12 +164,12 @@ public class Weapon : MonoBehaviour
             WeaponData weaponData = WeaponManager.instance.GetWeaponDataById(currentWeapon.name);
             if (weaponData != null)
             {
-                Debug.Log("Resetting weapon data for: " + currentWeapon.name);
+                //Debug.Log("Resetting weapon data for: " + currentWeapon.name);
                 ApplyUpgrades(weaponData);
             }
             else
             {
-                Debug.LogWarning("Weapon data not found for: " + currentWeapon.name);
+                //Debug.LogWarning("Weapon data not found for: " + currentWeapon.name);
             }
         }
     }
@@ -178,7 +180,7 @@ public class Weapon : MonoBehaviour
         this.damage = weaponData.damage;
         this.reloadSpeed = weaponData.reloadSpeed;
         this.fireSpeed = weaponData.fireSpeed;
-        Debug.Log($"Weapon data set to: {weaponData.weaponName}, fireSpeed: {fireSpeed}");
+        //Debug.Log($"Weapon data set to: {weaponData.weaponName}, fireSpeed: {fireSpeed}");
     }
 
     public void SwitchWeapon(int weaponIndex)
@@ -191,11 +193,11 @@ public class Weapon : MonoBehaviour
             weaponType = (WeaponType)weaponIndex; // Set the new weapon type
 
             // Log the fireSpeed value after switching weapons
-            Debug.Log($"Switched to weapon: {weaponType}, fireSpeed: {fireSpeed}");
+            //Debug.Log($"Switched to weapon: {weaponType}, fireSpeed: {fireSpeed}");
         }
         else
         {
-            Debug.LogError("Weapon index out of range");
+            //Debug.LogError("Weapon index out of range");
         }
     }
 
@@ -219,12 +221,12 @@ public class Weapon : MonoBehaviour
                 }
 
                 muzzleFlashInstance.SetActive(true);
-                Debug.Log("Muzzle flash effect activated");
+                //Debug.Log("Muzzle flash effect activated");
 
                 StartCoroutine(DeactivateMuzzleFlash());
 
                 weaponAmmo[weaponType]--; // Decrease ammo for the current weapon
-                Debug.Log("Starting FireDelay coroutine");
+                //Debug.Log("Starting FireDelay coroutine");
                 StartCoroutine(FireDelay());
 
                 if (weaponAmmo[weaponType] <= 0)
@@ -235,7 +237,7 @@ public class Weapon : MonoBehaviour
             }
             else
             {
-                Debug.Log("Out of ammo! Reload required.");
+                //Debug.Log("Out of ammo! Reload required.");
                 StartCoroutine(InitiateReload(0.2f)); // Start the reload process if out of ammo
             }
         }
@@ -253,7 +255,7 @@ public class Weapon : MonoBehaviour
     {
         if (weaponType == WeaponType.Shotgun)
         {
-            Debug.Log("Shooting spread shot.");
+            //Debug.Log("Shooting spread shot.");
             float angleStep = 10f; // Adjust this value to control the spread
             Vector2[] directions = new Vector2[5];
 
@@ -274,17 +276,17 @@ public class Weapon : MonoBehaviour
         }
         else
         {
-            Debug.Log("No weapon found.");
+            //Debug.Log("No weapon found.");
             return new Vector2[0];
         }
     }
     private IEnumerator FireDelay()
     {
         canShoot = false;
-        Debug.Log("FireDelay started, waiting for " + fireSpeed + " seconds");
+        //Debug.Log("FireDelay started, waiting for " + fireSpeed + " seconds");
         yield return new WaitForSeconds(fireSpeed);
         canShoot = true;
-        Debug.Log("FireDelay ended, canShoot set to true");
+       // Debug.Log("FireDelay ended, canShoot set to true");
     }
 
     private IEnumerator DeactivateMuzzleFlash()
@@ -292,12 +294,12 @@ public class Weapon : MonoBehaviour
         yield return new WaitForSeconds(0.1f); // Adjust the delay as needed
         if (muzzleFlashInstance != null)
         {
-            Debug.Log("Deactivating muzzle flash");
+            //Debug.Log("Deactivating muzzle flash");
             muzzleFlashInstance.SetActive(false);
         }
         else
         {
-            Debug.LogWarning("Muzzle flash instance is null");
+            //Debug.LogWarning("Muzzle flash instance is null");
         }
     }
 
@@ -314,6 +316,12 @@ public class Weapon : MonoBehaviour
         // Define two colors for the ping-pong effect
         Color startColor = Color.grey;
         Color endColor = Color.red;
+
+        if (reloadSound != null)
+        {
+            reloadSound.pitch = reloadSound.clip.length / delay; // Adjust the pitch based on the reload speed
+            reloadSound.Play();
+        }
 
         float elapsedTime = 0;
         while (elapsedTime < delay)
@@ -348,6 +356,11 @@ public class Weapon : MonoBehaviour
         // Reset the face dilate property and color
         reloadingTextMaterial.SetFloat(ShaderUtilities.ID_FaceDilate, 0);
         reloadingTextMaterial.SetColor(ShaderUtilities.ID_FaceColor, startColor);
+
+        if (reloadSound != null)
+        {
+            reloadSound.pitch = 1; // Reset the pitch to normal after reloading
+        }
     }
 
     public void StopReload()
@@ -376,7 +389,7 @@ public class Weapon : MonoBehaviour
         {
             reloadSpeedUpgrade = Mathf.Min(reloadSpeedUpgrade + 0.2f, weaponData.reloadSpeed - weaponData.minReloadSpeed);
             ApplyUpgrades(weaponData);
-            Debug.Log("Upgraded reload speed: " + reloadSpeed);
+            //Debug.Log("Upgraded reload speed: " + reloadSpeed);
         }
         else
         {

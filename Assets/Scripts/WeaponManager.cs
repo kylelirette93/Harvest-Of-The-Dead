@@ -107,7 +107,7 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
         }
         else
         {
-            Debug.LogWarning("No weapon ID found in PlayerPrefs.");
+            //Debug.LogWarning("No weapon ID found in PlayerPrefs.");
         }
     }
 
@@ -118,7 +118,7 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
             if (weapon.unlockDay <= currentDay && !unlockedWeapons.Contains(weapon) && purchasedWeapons.Contains(weapon.weaponId))
             {
                 unlockedWeapons.Add(weapon);
-                Debug.Log("Weapon unlocked: " + weapon.weaponName);
+                //Debug.Log("Weapon unlocked: " + weapon.weaponName);
             }
         }
     }
@@ -140,11 +140,11 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
                 UpdateUpgradeUI();
             }
             UpdateSelectedWeaponUI();
-            Debug.Log($"Weapon {weaponId} selected: {selectedWeapon.weaponName}");
+            //Debug.Log($"Weapon {weaponId} selected: {selectedWeapon.weaponName}");
         }
         else
         {
-            Debug.LogWarning("Selected weapon data is null.");
+            //Debug.LogWarning("Selected weapon data is null.");
         }
     }
 
@@ -154,12 +154,12 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
     {
         if (index < 0 || index >= unlockedWeapons.Count)
         {
-            Debug.LogWarning("Invalid weapon index: " + index);
+           // Debug.LogWarning("Invalid weapon index: " + index);
             return;
         }
 
         selectedWeapon = unlockedWeapons[index];
-        Debug.Log("Selected weapon: " + selectedWeapon.weaponName);
+        //Debug.Log("Selected weapon: " + selectedWeapon.weaponName);
 
         Weapon.instance.InstantiateWeapon(index);
         UpdateSelectedWeaponUI();
@@ -189,7 +189,7 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
         if (weaponsDictionary.TryGetValue(weaponId, out WeaponData weaponData))
         {
             purchasedWeapons.Add(weaponId);
-            Debug.Log($"Weapon {weaponId} purchased.");
+            //Debug.Log($"Weapon {weaponId} purchased.");
         }
     }
 
@@ -198,7 +198,7 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
         if (weaponsDictionary.TryGetValue(weaponId, out WeaponData weaponData) && !unlockedWeapons.Contains(weaponData) && purchasedWeapons.Contains(weaponId))
         {
             unlockedWeapons.Add(weaponData);
-            Debug.Log($"Weapon {weaponId} unlocked.");
+            //Debug.Log($"Weapon {weaponId} unlocked.");
         }
     }
 
@@ -211,7 +211,7 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
     {
         if (selectedWeapon == null)
         {
-            Debug.LogWarning("No weapon selected to upgrade.");
+            //Debug.LogWarning("No weapon selected to upgrade.");
             return;
         }
 
@@ -219,21 +219,21 @@ public class WeaponManager : MonoBehaviour, IDataPersistence
         {
             case "Damage":
                 selectedWeapon.damage = Mathf.Min(selectedWeapon.damage + valueChange, selectedWeapon.maxDamage);
-                Debug.Log("Upgraded damage: " + selectedWeapon.damage);
+                //Debug.Log("Upgraded damage: " + selectedWeapon.damage);
                 break;
 
             case "ReloadSpeed":
                 selectedWeapon.reloadSpeed = Mathf.Max(selectedWeapon.reloadSpeed - valueChange, selectedWeapon.minReloadSpeed);
-                Debug.Log("Upgraded reload speed: " + selectedWeapon.reloadSpeed);
+                //Debug.Log("Upgraded reload speed: " + selectedWeapon.reloadSpeed);
                 break;
 
             case "FireSpeed":
                 selectedWeapon.fireSpeed = Mathf.Max(selectedWeapon.fireSpeed - valueChange, selectedWeapon.minFireSpeed);
-                Debug.Log("Upgraded fire speed: " + selectedWeapon.fireSpeed);
+                //Debug.Log("Upgraded fire speed: " + selectedWeapon.fireSpeed);
                 break;
 
             default:
-                Debug.LogWarning($"Unknown stat type: {statType}");
+                //Debug.LogWarning($"Unknown stat type: {statType}");
                 break;
         }
 

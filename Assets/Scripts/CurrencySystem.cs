@@ -35,26 +35,26 @@ public class CurrencySystem : IDataPersistence
     public static void BankCurrency()
     {
         bankedCurrency += currency;
-        Debug.Log("Banking currency. Banked currency: " + bankedCurrency);
+        //Debug.Log("Banking currency. Banked currency: " + bankedCurrency);
         ResetCurrency();
     }
 
     public static int GetCurrency()
     {
-        Debug.Log("Getting currency. Current currency: " + currency);
+        //Debug.Log("Getting currency. Current currency: " + currency);
         return currency;
     }
 
     public static void ResetCurrency()
     {
-        Debug.Log("Resetting currency. Previous currency: " + currency);
+        //Debug.Log("Resetting currency. Previous currency: " + currency);
         currency = 0;
     }
 
     public static void ResetEarnedCurrency()
     {
         // Reset currency earned for the day.
-        Debug.Log("Resetting earned currency. Previous earned currency: " + earnedCurrency);
+        //Debug.Log("Resetting earned currency. Previous earned currency: " + earnedCurrency);
         earnedCurrency = 0;
     }
 }

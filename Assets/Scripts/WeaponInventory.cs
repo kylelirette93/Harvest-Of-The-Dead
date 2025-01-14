@@ -8,7 +8,7 @@ public class WeaponInventory
     {
         if (!weapons.Contains(weapon))
         {
-            Debug.Log("Weapon added to inventory: " + weapon.name);
+            //Debug.Log("Weapon added to inventory: " + weapon.name);
             weapons.Add(weapon);
         }
     }

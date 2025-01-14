@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public VideoPlayer studioNameVideoPlayer;
     public GameObject mainMenuPanel;
     public GameObject fileSelectionPanel;
+    public GameObject instructionsPanel;
     public GameObject gunPanel;
     public GameObject graveyardPrefab;
     public GameObject playerPrefab;
@@ -59,6 +60,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         StudioName,
         MainMenu,
         SelectFile,
+        Instructions,
         Init,
         Playing,
         NewDay,
@@ -96,14 +98,19 @@ public class GameManager : MonoBehaviour, IDataPersistence
             case GameState.SelectFile:
                 fileSelectionPanel.SetActive(false);
                 break;
+                case GameState.Instructions:
+                    instructionsPanel.SetActive(false);
+                break;
             case GameState.Init:
                 break;
             case GameState.Playing:
                 gunPanel.SetActive(false);
                 statsPanel.SetActive(false);
                 StopMusic();
+                EnableCursor();
                 break;
             case GameState.NewDay:
+                EnableCursor();
                 break;
             case GameState.Death:
                 deathPanel.SetActive(false);
@@ -137,6 +144,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
             case GameState.SelectFile:
                 fileSelectionPanel.SetActive(true);
                 break;
+            case GameState.Instructions:
+                                    instructionsPanel.SetActive(true);
+                break;
             case GameState.Init:
                 StopMusic();
                 gunPanel.SetActive(true);
@@ -149,11 +159,13 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 ChangeState(GameState.Playing);
                 break;
             case GameState.Playing:
+                DisableCursor();
                 Invoke("SpawnEnemies", 0.1f);
                 Time.timeScale = 1;
                 PlayMusic(gamePlayMusic);
                 break;
             case GameState.NewDay:
+                DisableCursor();
                 AdvanceDay();
                 RefillAmmunition();
                 gunPanel.SetActive(true);
@@ -190,15 +202,26 @@ public class GameManager : MonoBehaviour, IDataPersistence
                 retreatPanel.SetActive(true);
                 displayCurrencyScript.UpdateUI();
                 statsPanel.SetActive(false);
-                Time.timeScale = 1;
+                Time.timeScale = 0;
                 break;
             case GameState.Upgrade:
                 upgradePanel.SetActive(true);
-                Time.timeScale = 1;
+                Time.timeScale = 0;
                 break;
         }
     }
 
+    void DisableCursor()
+    {
+        Cursor.visible = false; // Hides the cursor
+        Cursor.lockState = CursorLockMode.Confined; // Locks the cursor to the center of the screen
+    }
+
+    void EnableCursor()
+    {
+        Cursor.visible = true; // Shows the cursor
+        Cursor.lockState = CursorLockMode.None; // Unlocks the cursor
+    }
     public void LoadData(GameData data)
     {
         this.CurrentDay = data.currentDay;
@@ -218,6 +241,10 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
 
        blackScreen.SetActive(false);
+    }
+
+    public void InstructionsButtonClicked()     {
+        ChangeState(GameState.Instructions);
     }
     void PlayMusic(AudioClip clip)
     {
@@ -299,6 +326,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     public void Pause()
     {
+        Player.instance.DisableCrosshair();
+        EnableCursor();
         Weapon.instance.canShoot = false;
         DeactivateHealthBars();
         pausePanel.SetActive(true);
@@ -307,6 +336,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     public void Unpause()
     {
+        Player.instance.EnableCrosshair();
+        DisableCursor();
         Weapon.instance.canShoot = true;
         ReactivateHealthBars();
         pausePanel.SetActive(false);
@@ -324,7 +355,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         if (playerInstance != null)
         {
-            Debug.Log("Activating player instance");
+            //Debug.Log("Activating player instance");
             playerInstance.SetActive(true);
             Player playerScript = playerInstance.GetComponent<Player>();
             if (playerScript != null)
@@ -334,12 +365,12 @@ public class GameManager : MonoBehaviour, IDataPersistence
             }
             else
             {
-                Debug.LogError("Player component not found on playerInstance");
+                //Debug.LogError("Player component not found on playerInstance");
             }
         }
         else
         {
-            Debug.LogError("playerInstance is null, cannot activate player");
+            //Debug.LogError("playerInstance is null, cannot activate player");
         }
     }
 
@@ -347,13 +378,13 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         if (playerInstance != null)
         {
-            Debug.Log("Deactivating player instance");
+            //Debug.Log("Deactivating player instance");
             playerInstance.SetActive(false);
             playerInstance.GetComponent<Player>().enabled = false;
         }
         else
         {
-            Debug.LogWarning("Player instance is already null or destroyed");
+            //Debug.LogWarning("Player instance is already null or destroyed");
         }
     }
 
@@ -382,7 +413,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         }
         else
         {
-            Debug.LogWarning("Player instance already exists. Skipping spawn.");
+           // Debug.LogWarning("Player instance already exists. Skipping spawn.");
         }
     }
 
